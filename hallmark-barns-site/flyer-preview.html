@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flyer Preview</title>
+    <style>
+        @page { size: 8.5in 11in; margin: 0; }
+        body { margin: 0; padding: 0; background: #fff; }
+        .flyer {
+            width: 8.5in;
+            height: 11in;
+            padding: 0.5in;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: center;
+        }
+        .border-wrap {
+            border: 12px solid #2c3e50;
+            height: 100%;
+            padding: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .logo { max-width: 300px; margin-bottom: 10px; }
+        h1 { font-size: 64px; margin: 0; color: #2c3e50; letter-spacing: 4px; font-weight: 900; }
+        .subtitle { font-size: 24px; font-weight: bold; color: #e67e22; margin-top: 5px; }
+        .info-box { background: #f8f9fa; padding: 30px; border-radius: 15px; margin: 30px 0; border: 1px solid #ddd; }
+        .style { font-size: 42px; margin: 0; color: #2c3e50; }
+        .size { font-size: 32px; margin: 10px 0; color: #34495e; }
+        .serial { font-size: 18px; color: #7f8c8d; border-top: 1px solid #ccc; padding-top: 15px; margin-top: 15px; }
+        .price { font-size: 72px; font-weight: 900; color: #27ae60; margin-top: 20px; }
+        .qr-code { width: 250px; height: 250px; border: 4px solid #2c3e50; padding: 10px; border-radius: 10px; }
+        .scan-text { font-size: 20px; font-weight: bold; margin-top: 15px; }
+        .footer { border-top: 2px solid #eee; padding-top: 25px; }
+        .name { font-size: 32px; font-weight: bold; margin: 0; }
+        .phone { font-size: 28px; color: #2c3e50; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="flyer">
+        <div class="border-wrap">
+            <div>
+                <img src="https://hallmarkbarns.com/wp-content/themes/hallmark-barns/assets/images/logo.png" class="logo">
+                <h1>BUY NOW</h1>
+                <p class="subtitle">AVAILABLE TODAY IN SPENCER</p>
+            </div>
+            <div class="info-box">
+                <h2 class="style">Deluxe Dog Kennel (Repo)</h2>
+                <p class="size">12' x 16'</p>
+                <div class="serial">Serial #: <strong>DDK-1216-06212025-5296</strong></div>
+                <div class="price">$3,500.00</div>
+            </div>
+            <div>
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://hallmark-barns-demo.netlify.app/order-rto.html?serial=DDK-1216-06212025-5296" class="qr-code">
+                <p class="scan-text">SCAN TO START YOUR ORDER</p>
+                <p style="font-size: 14px; color: #95a5a6;">Cash or Rent-to-Own available instantly</p>
+            </div>
+            <div class="footer">
+                <p class="name">Jared Baker</p>
+                <p class="phone">(317) 370-5720</p>
+                <p style="font-size: 14px; margin-top: 10px;">Authorized Hallmark Dealer | Spencer, IN</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

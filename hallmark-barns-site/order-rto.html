@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rent-To-Own Order | Hallmark Spencer</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #e67e22;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --success: #27ae60;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+        .header {
+            background-color: var(--primary);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: -40px auto 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h2 { 
+            color: var(--primary); 
+            border-bottom: 2px solid var(--light); 
+            padding-bottom: 10px; 
+            margin-top: 2rem;
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-row { display: flex; gap: 20px; flex-wrap: wrap; }
+        .form-row > .form-group { flex: 1; min-width: 250px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="date"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        .file-input-wrapper {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+        .submit-btn {
+            background-color: var(--success);
+            color: white;
+            padding: 20px 40px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.4rem;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+            margin-top: 2rem;
+        }
+        .submit-btn:hover { background-color: #219150; }
+        .back-link { display: block; text-align: center; margin-top: 20px; color: var(--primary); text-decoration: none; font-weight: bold; }
+        .step-indicator { display: flex; justify-content: space-between; margin-bottom: 30px; text-align: center; }
+        .step { flex: 1; padding: 10px; background: var(--light); border-radius: 4px; margin: 0 5px; font-size: 0.9rem; font-weight: bold; }
+        .step.active { background: var(--accent); color: white; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Rent-To-Own Order Form</h1>
+    <p>Complete this form to start your contract process.</p>
+</div>
+
+<div class="container">
+    <div class="step-indicator">
+        <div class="step active">1. Personal Info</div>
+        <div class="step active">2. Documentation</div>
+        <div class="step">3. Contract</div>
+        <div class="step">4. Delivery</div>
+    </div>
+
+    <form name="rto-order" method="POST" data-netlify="true" enctype="multipart/form-data" action="/success.html">
+        <h2>Primary Applicant</h2>
+        <div class="form-group">
+            <label for="name">Full Name (Legal) *</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Cell Phone *</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="dob">Date of Birth *</label>
+                <input type="date" id="dob" name="dob" required>
+            </div>
+            <div class="form-group">
+                <label for="ssn">Last 4 of SSN (Verification Only) *</label>
+                <input type="text" id="ssn" name="ssn" maxlength="4" required>
+            </div>
+        </div>
+
+        <h2>Address Information</h2>
+        <div class="form-group">
+            <label for="address">Street Address (Delivery Site) *</label>
+            <input type="text" id="address" name="address" required>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="city">City *</label>
+                <input type="text" id="city" name="city" required>
+            </div>
+            <div class="form-group">
+                <label for="state">State *</label>
+                <input type="text" id="state" name="state" required>
+            </div>
+            <div class="form-group">
+                <label for="zip">Zip Code *</label>
+                <input type="text" id="zip" name="zip" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Do you own or rent this property? *</label>
+            <select name="property_status" required>
+                <option value="own">I own the property</option>
+                <option value="rent">I rent (Landlord permission required)</option>
+            </select>
+        </div>
+
+        <h2>Identity Verification</h2>
+        <div class="form-group">
+            <label>Upload Photo of Driver's License (Front) *</label>
+            <div class="file-input-wrapper">
+                <input type="file" id="dl_front" name="dl_front" accept="image/*" required>
+                <p style="font-size: 0.8rem; color: #666;">Clear photo required for contract legal verification.</p>
+            </div>
+        </div>
+
+        <h2>Employment & References</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="employer">Employer Name *</label>
+                <input type="text" id="employer" name="employer" required>
+            </div>
+            <div class="form-group">
+                <label for="work_phone">Work Phone</label>
+                <input type="tel" id="work_phone" name="work_phone">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label>Personal Reference #1 (Name & Phone) *</label>
+            <input type="text" name="ref1" required placeholder="Name - (555) 555-5555">
+        </div>
+        <div class="form-group">
+            <label>Personal Reference #2 (Name & Phone) *</label>
+            <input type="text" name="ref2" required placeholder="Name - (555) 555-5555">
+        </div>
+
+        <h2>Building Selections</h2>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="building_type">Building Style *</label>
+                <select id="building_type" name="building_type" required>
+                    <option value="lofted_barn">Lofted Barn</option>
+                    <option value="utility">Utility Shed</option>
+                    <option value="cabin">Cabin / Lofted Cabin</option>
+                    <option value="garage">Garage</option>
+                    <option value="kennel">Dog Kennel</option>
+                    <option value="coop">Chicken Coop</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="size">Size *</label>
+                <input type="text" id="size" name="size" placeholder="e.g. 10x16" required>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="colors">Color Selections (Siding, Trim, Roof)</label>
+            <textarea id="colors" name="colors" rows="2" placeholder="Siding: Gray, Trim: White, Roof: Charcoal"></textarea>
+        </div>
+
+        <div style="background: #fff3cd; padding: 20px; border-radius: 4px; margin-top: 2rem; border-left: 5px solid #ffc107;">
+            <strong>Next Steps:</strong> Once you submit, Jared will review the details and generate your legal contracts. You will receive an email from <em>DocuSign</em> or <em>HelloSign</em> to sign electronically. No payment is taken until after the contract is signed.
+        </div>
+
+        <button type="submit" class="submit-btn">Submit Order & Request Contracts</button>
+    </form>
+    
+    <a href="index.html" class="back-link">← Back to Home</a>
+</div>
+
+</body>
+</html>

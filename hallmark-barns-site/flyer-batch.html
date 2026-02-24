@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page { size: 8.5in 11in; margin: 0; }
+        body { margin: 0; padding: 0; background: #fff; }
+        .page-break { page-break-after: always; }
+        .flyer {
+            width: 8.5in;
+            height: 11in;
+            padding: 0.3in;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            overflow: hidden;
+        }
+        .border-wrap {
+            border: 10px solid #2c3e50;
+            height: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .logo { max-width: 240px; margin-bottom: 2px; }
+        h1 { font-size: 60px; margin: 0; color: #2c3e50; letter-spacing: 4px; font-weight: 900; line-height: 1; }
+        .subtitle { font-size: 20px; font-weight: bold; color: #e67e22; margin-top: 2px; text-transform: uppercase; }
+        .building-photo { width: 100%; height: 3in; object-fit: cover; border-radius: 8px; border: 3px solid #eee; margin: 10px 0; }
+        .info-box { background: #f8f9fa; padding: 15px; border-radius: 12px; border: 2px solid #ddd; }
+        .style { font-size: 34px; margin: 0; color: #2c3e50; font-weight: 800; }
+        .size { font-size: 28px; margin: 2px 0; color: #34495e; font-weight: 600; }
+        .price { font-size: 70px; font-weight: 900; color: #27ae60; margin: 5px 0; line-height: 1; }
+        .qr-row { display: flex; gap: 15px; margin-top: 10px; }
+        .qr-card { flex: 1; background: #2c3e50; color: white; padding: 12px; border-radius: 10px; display: flex; flex-direction: column; align-items: center; }
+        .qr-card img { width: 130px; height: 130px; background: white; padding: 8px; border-radius: 5px; margin-bottom: 8px; }
+        .qr-card h3 { font-size: 16px; margin: 0; color: #e67e22; }
+        .qr-card p { font-size: 11px; margin: 3px 0 0 0; opacity: 0.9; }
+        .footer { border-top: 2px solid #eee; padding-top: 10px; display: flex; justify-content: space-between; align-items: flex-end; }
+        .name { font-size: 24px; font-weight: bold; margin: 0; color: #2c3e50; }
+        .phone { font-size: 22px; color: #e67e22; font-weight: bold; margin: 0; }
+        .serial-tag { font-size: 12px; color: #7f8c8d; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <div id="content"></div>
+
+    <script>
+        const buildings = [
+            { style: "Standard Dog Kennel (Repo)", size: "8 x 8", price: "$1,495.00", serial: "SDK880225202011D", img: "https://dms.hallmarkbarns.com/storage/buildings/2020/11/SDK880225202011D.jpg" },
+            { style: "Deluxe Dog Kennel (Repo)", size: "12 x 16", price: "$3,500.00", serial: "DDK-1216-06212025-5296", img: "https://dms.hallmarkbarns.com/storage/buildings/2025/11/01K9ZR4CX8WGK431E148D9Y1S5.jpg" },
+            { style: "Standard Dog Kennel (Repo)", size: "8 x 8", price: "$1,795.00", serial: "SDK-88-05312025-4857", img: "https://dms.hallmarkbarns.com/storage/buildings/2025/05/SDK-88-05312025-4857.jpg" },
+            { style: "Run-in Shelter", size: "10 x 12", price: "$3,160.00", serial: "RS-1012-01232026-0010", img: "https://dms.hallmarkbarns.com/storage/dealer/2026/02/01KGSPRKA8YKSQ968ZKPPTTEQT.jpg" },
+            { style: "Deluxe Dog Kennel", size: "8 x 12", price: "$4,765.00", serial: "DK-0812-012624-016-THS", img: "https://dms.hallmarkbarns.com/storage/buildings/2024/01/DK-0812-012624-016-THS.jpg" },
+            { style: "Greenhouse", size: "12 x 12", price: "$6,300.00", serial: "GH-1212-092624-107-IS", img: "https://dms.hallmarkbarns.com/storage/buildings/2024/09/GH-1212-092624-107-IS.jpg" },
+            { style: "Cabin", size: "12 x 24", price: "$8,722.00", serial: "C-1224-05202025-4451", img: "https://dms.hallmarkbarns.com/storage/buildings/2025/05/C-1224-05202025-4451.jpg" },
+            { style: "Utility Shed", size: "10 x 12", price: "$3,160.00", serial: "us-1012-070924-90-ic", img: "https://dms.hallmarkbarns.com/storage/buildings/2024/07/us-1012-070924-90-ic.jpg" },
+            { style: "Lofted Cabin", size: "10 x 16", price: "$5,630.00", serial: "LC-1016-08524-581-IC", img: "https://dms.hallmarkbarns.com/storage/buildings/2024/08/LC-1016-08524-581-IC.jpg" },
+            { style: "Cabin", size: "12 x 24", price: "$7,790.00", serial: "C-1224-092624-106-IS", img: "https://dms.hallmarkbarns.com/storage/buildings/2024/09/C-1224-092624-106-IS.jpg" },
+            { style: "Garden Shed", size: "10 x 16", price: "$4,105.00", serial: "gs-1016-121224-112-is", img: "https://dms.hallmarkbarns.com/storage/buildings/2024/12/gs-1016-121224-112-is.jpg" },
+            { style: "Garden Shed", size: "12 x 16", price: "$5,320.00", serial: "gs-1216-081624-290-cl", img: "https://dms.hallmarkbarns.com/storage/buildings/2024/08/gs-1216-081624-290-cl.jpg" },
+            { style: "Garden Shed (Repo)", size: "10 x 12", price: "$2,888.00", serial: "GS-1012-012623-THE-39", img: "https://dms.hallmarkbarns.com/storage/buildings/2023/01/GS-1012-012623-THE-39.jpg" },
+            { style: "Garage (Repo)", size: "12 x 16", price: "$4,985.00", serial: "G-1216-030721-195-IK", img: "https://dms.hallmarkbarns.com/storage/buildings/2021/03/G-1216-030721-195-IK.jpg" },
+            { style: "Lofted Garden Shed", size: "12 x 24", price: "$6,990.00", serial: "LGS-1224-121224-115-IS", img: "https://dms.hallmarkbarns.com/storage/buildings/2024/12/LGS-1224-121224-115-IS.jpg" },
+            { style: "Garage (Repo)", size: "12 x 16", price: "$5,015.00", serial: "PG-1216-012023-THS-25", img: "https://dms.hallmarkbarns.com/storage/buildings/2023/01/PG-1216-012023-THS-25.jpg" },
+            { style: "Garden Shed", size: "12 x 16", price: "$4,855.00", serial: "gs-1216-32823-023-ic", img: "https://dms.hallmarkbarns.com/storage/buildings/2023/03/gs-1216-32823-023-ic.jpg" },
+            { style: "Lofted Barn", size: "12 x 16", price: "$5,520.00", serial: "LB-1216-072624-579-IC", img: "https://dms.hallmarkbarns.com/storage/buildings/2024/07/LB-1216-072624-579-IC.jpg" },
+            { style: "Garden Shed", size: "8 x 12", price: "$2,990.00", serial: "GS-0812-04523-035-IC", img: "https://dms.hallmarkbarns.com/storage/buildings/2023/04/GS-0812-04523-035-IC.jpg" },
+            { style: "Garden Shed", size: "12 x 16", price: "$4,945.00", serial: "gs-1216-32923-028-ic", img: "https://dms.hallmarkbarns.com/storage/buildings/2023/03/gs-1216-32923-028-ic.jpg" },
+            { style: "Lofted Garden Shed", size: "8 x 12", price: "$3,385.00", serial: "LGS-812-121423-283-IC", img: "https://dms.hallmarkbarns.com/storage/buildings/2023/12/LGS-812-121423-283-IC.jpg" },
+            { style: "Lofted Barn", size: "12 x 20", price: "$5,420.00", serial: "HB-10432", img: "https://dms.hallmarkbarns.com/storage/buildings/2026/02/HB-10432.jpg" },
+            { style: "Utility Shed", size: "10 x 16", price: "$3,895.00", serial: "HB-10551", img: "https://dms.hallmarkbarns.com/storage/buildings/2026/02/HB-10551.jpg" },
+            { style: "Garden Shed", size: "8 x 12", price: "$2,950.00", serial: "HB-10582", img: "https://dms.hallmarkbarns.com/storage/buildings/2026/02/HB-10582.jpg" },
+            { style: "Garage", size: "12 x 24", price: "$7,100.00", serial: "HB-10614", img: "https://dms.hallmarkbarns.com/storage/buildings/2026/02/HB-10614.jpg" }
+        ];
+
+        const content = document.getElementById('content');
+        buildings.forEach((b, index) => {
+            const page = document.createElement('div');
+            page.className = 'flyer' + (index < buildings.length - 1 ? ' page-break' : '');
+            page.innerHTML = `
+                <div class="border-wrap">
+                    <div>
+                        <img src="https://hallmarkbarns.com/wp-content/themes/hallmark-barns/assets/images/logo.png" class="logo">
+                        <h1>BUY NOW</h1>
+                        <p class="subtitle">Available Today in Spencer, IN</p>
+                    </div>
+                    <div>
+                        <img src="${b.img}" class="building-photo" onerror="this.src='https://hallmarkbarns.com/wp-content/uploads/2023/11/hallmark-barns-utility-shed-scaled.jpg'">
+                        <div class="info-box">
+                            <h2 class="style">${b.style}</h2>
+                            <p class="size">${b.size}</p>
+                            <div class="price">${b.price}</div>
+                        </div>
+                    </div>
+                    <div class="qr-row">
+                        <div class="qr-card">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://hallmarkspencer.com/order-rto.html?serial=${b.serial}">
+                            <h3>BUY THIS UNIT</h3>
+                            <p>Scan to start your <strong>Cash</strong> or <strong>RTO</strong> order.</p>
+                        </div>
+                        <div class="qr-card" style="background: #34495e;">
+                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://hallmarkspencer.com">
+                            <h3>VISIT US ONLINE</h3>
+                            <p>View full inventory and carports at <strong>hallmarkspencer.com</strong></p>
+                        </div>
+                    </div>
+                    <div class="footer">
+                        <div style="text-align: left;">
+                            <p class="name">Jared Baker</p>
+                            <p class="phone">(317) 370-5720</p>
+                        </div>
+                        <div class="serial-tag">SERIAL: ${b.serial}</div>
+                    </div>
+                </div>
+            `;
+            content.appendChild(page);
+        });
+    </script>
+</body>
+</html>

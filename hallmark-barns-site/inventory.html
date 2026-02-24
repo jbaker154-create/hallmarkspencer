@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Lot Inventory | Hallmark Spencer</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #e67e22;
+            --success: #27ae60;
+            --cash: #2980b9;
+            --light: #f4f7f6;
+        }
+        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; margin: 0; background: var(--light); color: #333; }
+        header { background: var(--primary); color: white; padding: 2rem; text-align: center; }
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+        .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; margin-top: 30px; }
+        .unit-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.1); border: 1px solid #ddd; display: flex; flex-direction: column; transition: transform 0.2s; }
+        .unit-card:hover { transform: translateY(-5px); }
+        .unit-img { width: 100%; height: 220px; object-fit: cover; background: #eee; border-bottom: 3px solid var(--accent); }
+        .unit-info { padding: 20px; flex-grow: 1; text-align: center; }
+        .unit-style { font-size: 1.4rem; font-weight: bold; color: var(--primary); margin: 0; }
+        .unit-size { color: #666; font-size: 1.1rem; margin: 5px 0; }
+        .unit-serial { font-family: monospace; font-size: 0.85rem; color: #999; margin-bottom: 10px; display: block; }
+        .unit-price { font-size: 2.2rem; font-weight: 900; color: var(--success); margin: 15px 0; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .buy-btn { flex: 1; text-align: center; color: white; text-decoration: none; padding: 12px 5px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; transition: opacity 0.2s; }
+        .buy-btn.rto { background: var(--accent); }
+        .buy-btn.cash { background: var(--cash); }
+        .buy-btn:hover { opacity: 0.9; }
+        .back-link { display: inline-block; margin-bottom: 20px; color: var(--primary); text-decoration: none; font-weight: bold; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; }
+        .badge-repo { background: #ff4757; color: white; }
+        .badge-new { background: var(--success); color: white; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Current Lot Inventory</h1>
+    <p>Available Today in Spencer, IN — Buy Now or Rent-To-Own</p>
+</header>
+
+<div class="container">
+    <a href="index.html" class="back-link">← Back to Home</a>
+    <div class="inventory-grid" id="inventory"></div>
+</div>
+
+<script>
+    const buildings = [
+        { style: "Standard Dog Kennel", size: "8 x 8", price: "$1,495.00", serial: "SDK880225202011D", type: "repo", img: "actual_images/image6.jpeg" },
+        { style: "Deluxe Dog Kennel", size: "12 x 16", price: "$3,500.00", serial: "DDK-1216-06212025-5296", type: "repo", img: "actual_images/image22.jpeg" },
+        { style: "Standard Dog Kennel", size: "8 x 8", price: "$1,795.00", serial: "SDK-88-05312025-4857", type: "repo", img: "actual_images/image7.jpeg" },
+        { style: "Run-in Shelter", size: "10 x 12", price: "$3,160.00", serial: "RS-1012-01232026-0010", type: "new", img: "actual_images/image8.jpeg" },
+        { style: "Deluxe Dog Kennel", size: "8 x 12", price: "$4,765.00", serial: "DK-0812-012624-016-THS", type: "new", img: "actual_images/image9.png" },
+        { style: "Greenhouse", size: "12 x 12", price: "$6,300.00", serial: "GH-1212-092624-107-IS", type: "new", img: "actual_images/image23.jpeg" },
+        { style: "Cabin", size: "12 x 24", price: "$8,722.00", serial: "C-1224-05202025-4451", type: "new", img: "actual_images/image10.jpeg" },
+        { style: "Utility Shed", size: "10 x 12", price: "$3,160.00", serial: "us-1012-070924-90-ic", type: "new", img: "actual_images/image11.jpeg" },
+        { style: "Lofted Cabin", size: "10 x 16", price: "$5,630.00", serial: "LC-1016-08524-581-IC", type: "new", img: "actual_images/image13.jpeg" },
+        { style: "Cabin", size: "12 x 24", price: "$7,790.00", serial: "C-1224-092624-106-IS", type: "new", img: "actual_images/image14.jpeg" },
+        { style: "Garden Shed", size: "10 x 16", price: "$4,105.00", serial: "gs-1016-121224-112-is", type: "new", img: "actual_images/image15.jpeg" },
+        { style: "Garden Shed", size: "12 x 16", price: "$5,320.00", serial: "gs-1216-081624-290-cl", type: "new", img: "actual_images/image16.jpeg" },
+        { style: "Garden Shed", size: "10 x 12", price: "$2,888.00", serial: "GS-1012-012623-THE-39", type: "repo", img: "actual_images/image17.jpeg" },
+        { style: "Garage", size: "12 x 16", price: "$4,985.00", serial: "G-1216-030721-195-IK", type: "repo", img: "actual_images/image18.jpeg" },
+        { style: "Lofted Garden Shed", size: "12 x 24", price: "$6,990.00", serial: "LGS-1224-121224-115-IS", type: "new", img: "actual_images/image19.jpeg" },
+        { style: "Garage", size: "12 x 16", price: "$5,015.00", serial: "PG-1216-012023-THS-25", type: "repo", img: "actual_images/image20.jpeg" },
+        { style: "Garden Shed", size: "12 x 16", price: "$4,855.00", serial: "gs-1216-32823-023-ic", type: "new", img: "actual_images/image21.jpeg" },
+        { style: "Lofted Barn", size: "12 x 16", price: "$5,520.00", serial: "LB-1216-072624-579-IC", type: "new", img: "actual_images/image22.jpeg" },
+        { style: "Garden Shed", size: "8 x 12", price: "$2,990.00", serial: "GS-0812-04523-035-IC", type: "new", img: "actual_images/image23.jpeg" },
+        { style: "Garden Shed", size: "12 x 16", price: "$4,945.00", serial: "gs-1216-32923-028-ic", type: "new", img: "actual_images/image25.jpeg" },
+        { style: "Lofted Garden Shed", size: "8 x 12", price: "$3,385.00", serial: "LGS-812-121423-283-IC", type: "new", img: "actual_images/image24.png" },
+        { style: "Lofted Barn", size: "12 x 20", price: "$5,420.00", serial: "HB-10432", type: "new", img: "actual_images/image12.png" },
+        { style: "Utility Shed", size: "10 x 16", price: "$3,895.00", serial: "HB-10551", type: "new", img: "actual_images/image24.png" },
+        { style: "Garden Shed", size: "8 x 12", price: "$2,950.00", serial: "HB-10582", type: "new", img: "actual_images/image2.jpeg" },
+        { style: "Garage", size: "12 x 24", price: "$7,100.00", serial: "HB-10614", type: "new", img: "actual_images/image1.jpeg" }
+    ];
+
+    const grid = document.getElementById('inventory');
+    buildings.forEach(b => {
+        const card = document.createElement('div');
+        card.className = 'unit-card';
+        card.innerHTML = `
+            <img src="${b.img}" class="unit-img" onerror="this.src='https://hallmarkbarns.com/wp-content/uploads/2023/11/hallmark-barns-utility-shed-scaled.jpg'">
+            <div class="unit-info">
+                <span class="badge ${b.type === 'repo' ? 'badge-repo' : 'badge-new'}">${b.type.toUpperCase()}</span>
+                <p class="unit-style">${b.style}</p>
+                <p class="unit-size">${b.size}</p>
+                <span class="unit-serial">SN: ${b.serial}</span>
+                <div class="unit-price">${b.price}</div>
+                <div class="btn-group">
+                    <a href="order-rto.html?serial=${b.serial}&style=${encodeURIComponent(b.style)}&size=${encodeURIComponent(b.size)}" class="buy-btn rto">START RTO</a>
+                    <a href="order.html?serial=${b.serial}&style=${encodeURIComponent(b.style)}&size=${encodeURIComponent(b.size)}" class="buy-btn cash">BUY CASH</a>
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+</script>
+
+</body>
+</html>
