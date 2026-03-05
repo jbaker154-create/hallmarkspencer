@@ -42,13 +42,9 @@
             font-size: 1.1rem;
         }
         .hero {
-            background-color: #2c3e50;
-            background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://hallmarkbarns.com/wp-content/uploads/2023/11/hallmark-barns-utility-shed-scaled.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            background-color: var(--primary);
             color: white;
-            padding: 120px 20px;
+            padding: 80px 20px;
             text-align: center;
         }
         .hero h1 {
@@ -96,58 +92,59 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             border-top: 5px solid var(--primary);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .feature-card h3 {
-            color: var(--primary);
-            margin-top: 0;
-            font-size: 1.5rem;
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
         }
-        .feature-card ul {
-            text-align: left;
-            margin-top: 1rem;
-            padding-left: 20px;
-        }
-        .feature-card li {
-            margin-bottom: 0.5rem;
-        }
-        .price-tag {
-            font-weight: bold;
-            color: var(--accent);
-        }
-        footer {
-            background-color: var(--dark);
+        .cta-button {
+            background-color: var(--accent);
             color: white;
-            text-align: center;
-            padding: 2rem;
-            margin-top: auto;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: transform 0.2s, background 0.3s, box-shadow 0.3s;
+            display: inline-block;
+            margin: 10px;
         }
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-            .hero p { font-size: 1.2rem; }
+        .cta-button:hover {
+            background-color: #d35400;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .features > div {
+            animation: fadeIn 0.8s ease-out forwards;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="container">
-        <div style="text-align: center; margin-bottom: 10px;">
-            <img src="https://hallmarkbarns.com/wp-content/themes/hallmark-barns/assets/images/logo.png" alt="Hallmark Portable Buildings" style="max-width: 250px;">
+<header style="background-color: var(--primary); color: white; padding: 0; text-align: center;">
+    <div style="width: 100%; position: relative;">
+        <img src="actual_images/front-website-hero.jpg" alt="Hallmark Spencer Lot" style="width: 100%; height: auto; display: block; max-height: none;">
+        <div style="background: rgba(44, 62, 80, 0.9); padding: 20px; border-bottom: 3px solid var(--accent);">
+            <h1 style="margin: 0; font-size: 2.5rem; letter-spacing: 1px;">Hallmark Spencer</h1>
+            <p style="font-size: 1.2rem; margin: 5px 0 0 0; opacity: 0.9;">Authorized Dealer: Jared Baker</p>
         </div>
-        <h1>Hallmark Spencer</h1>
-        <p>Authorized Dealer: Jared Baker</p>
-        <nav>
-            <ul>
-                <li><a href="#buildings">Portable Buildings</a></li>
-                <li><a href="#carports">Steel Carports</a></li>
-                <li><a href="#decks">Timbercraft Decks</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
     </div>
+    <nav style="background-color: var(--primary); padding: 1rem 0;">
+        <ul>
+            <li><a href="#buildings">Portable Buildings</a></li>
+            <li><a href="#carports">Steel Carports</a></li>
+            <li><a href="#decks">Timbercraft Decks</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
 </header>
 
-<section class="hero">
+<section class="hero" style="padding: 60px 20px;">
     <h1>Quality Structures, Built to Last</h1>
     <p>Your one-stop shop for Barns, Custom Carports, and Premium Decks.</p>
     <a href="tel:+13173705720" class="cta-button" style="background-color: #27ae60;">📞 Call Jared Now</a>
@@ -162,7 +159,7 @@
     <!-- Hallmark Barns -->
     <div class="feature-card" style="border-top-color: #e67e22;">
         <div style="text-align: center; margin-bottom: 15px;">
-            <img src="https://hallmarkbarns.com/wp-content/uploads/2023/11/hallmark-barns-lofted-barn-scaled.jpg" alt="Hallmark Lofted Barn" style="width: 100%; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <img src="actual_images/hallmark-portable-buildings.png" alt="Hallmark Lofted Barn" style="width: 100%; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
         </div>
         <h3>🏠 Hallmark Portable Buildings</h3>
         <p>Premium storage solutions built to your specs. From compact 8x8 sheds to massive 16x40 cabins.</p>
@@ -180,6 +177,9 @@
 
     <!-- American Steel Carports -->
     <div class="feature-card" id="carports" style="border-top-color: #3498db;">
+        <div style="text-align: center; margin-bottom: 15px;">
+            <img src="actual_images/american-steel-carport.png" alt="American Steel Carport" style="width: 100%; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        </div>
         <h3>🚗 American Steel Carports</h3>
         <p>Industry-leading steel structures with 20+ years of experience.</p>
         <ul>
@@ -196,20 +196,28 @@
 
     <!-- Timbercraft Decks -->
     <div class="feature-card" id="decks" style="border-top-color: #8e44ad;">
+        <div style="text-align: center; margin-bottom: 15px;">
+            <img src="actual_images/decks/10x10-garden.png" alt="10x10 Timbercraft Patio Deck" style="width: 100%; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <p style="font-size: 0.9rem; font-style: italic; margin-top: 8px;">10' x 10' Timbercraft Deck in a garden setting</p>
+        </div>
         <h3>🔨 Timbercraft Decks</h3>
-        <p>Hand-crafted decks by <strong>David Keim</strong>. Expand your outdoor living space with premium wood construction.</p>
+        <p>Hand-crafted decks. Expand your outdoor living space with premium wood construction.</p>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <a href="decks.html" class="cta-button" style="width: 80%; font-size: 1rem; background-color: var(--deck);">View Full Gallery & Pricing</a>
+        </div>
         <ul>
-            <li><strong>Sizes:</strong> 8x8, 10x10, 10x12, 8x16, and Custom.</li>
+            <li><strong>Sizes:</strong> 8x8, 10x10, 10x12, 8x16, 12x24, and Custom.</li>
+            <li><strong>Options:</strong> Available with or without a roof.</li>
             <li><strong>Premium Stains:</strong> Mahogany, Burnt Hickory, Natural Cedar, Pewter Gray.</li>
-            <li><strong>Sample Pricing (Estimates):</strong>
+            <li><strong>Sample Pricing (8'x12' Model):</strong>
                 <ul>
-                    <li>8'x8' Step Deck: <span class="price-tag">~$2,029</span></li>
-                    <li>10'x12' Mahogany Deck: <span class="price-tag">~$3,633</span></li>
-                    <li>8'x16' Pewter Gray Deck: <span class="price-tag">~$3,584</span></li>
+                    <li>No Roof: <span class="price-tag">$2,795.82</span></li>
+                    <li>With Roof: <span class="price-tag">$3,994</span></li>
                 </ul>
             </li>
+            <li><strong>Rent-to-Own:</strong> Available on all stained models!</li>
         </ul>
-        <p><em>Contact us for the latest 2026 pricing catalog.</em></p>
+        <p><em>"Quality craftsmanship that transforms your backyard."</em></p>
     </div>
 </section>
 
