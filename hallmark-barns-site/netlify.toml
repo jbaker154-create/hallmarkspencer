@@ -1,0 +1,8 @@
+[build]
+  publish = "."
+
+[[plugins]]
+  package = "@netlify/plugin-emails"
+
+[forms]
+  notification_emails = ["jbaker154@gmail.com"]

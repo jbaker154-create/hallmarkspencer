@@ -69,6 +69,7 @@
 <body>
 
 <div class="header">
+    <img src="images/logo.jpg" alt="Hallmark Portable Buildings" style="max-width: 250px; margin-bottom: 1rem;">
     <h1>Start My Order</h1>
     <p>Let's take the first step together.</p>
 </div>
@@ -80,7 +81,11 @@
         <div class="step">3. Deposit</div>
     </div>
 
-    <form name="start-order" method="POST" data-netlify="true" action="/success.html">
+    <form action="https://formsubmit.co/jbaker154@gmail.com" method="POST">
+        <input type="hidden" name="_next" value="https://hallmarkspencer.com/success.html">
+        <input type="hidden" name="_subject" value="New Order Request from Hallmark Spencer">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_template" value="table">
         <h2>Customer Information</h2>
         <div class="form-group">
             <label for="name">Full Name *</label>
