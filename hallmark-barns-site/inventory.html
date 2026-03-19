@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -39,40 +39,201 @@
 
 <header>
     <h1>Current Lot Inventory</h1>
-    <p>Available Today in Spencer, IN — Buy Now or Rent-To-Own</p>
+    <p>Available Today in Spencer, IN â€” Buy Now or Rent-To-Own</p>
 </header>
 
 <div class="container">
-    <a href="index.html" class="back-link">← Back to Home</a>
+    <a href="index.html" class="back-link">â† Back to Home</a>
     <div class="inventory-grid" id="inventory"></div>
 </div>
 
 <script>
     const buildings = [
-        { style: "Cabin (Repo)", size: "14 x 28", price: "$8,995.00", serial: "C-1428-03122025-1621", type: "repo", img: "actual_images/image1.jpeg" },
-        { style: "Mini Barn", size: "8 x 8", price: "$2,040.00", serial: "MB-88-10302025-0114", type: "new", img: "actual_images/MB-88-10302025-0114-front.jpg" },
-        { style: "Utility Shed", size: "8 x 12", price: "$2,990.00", serial: "US-812-10302025-0203", type: "new", img: "actual_images/US-812-10302025-0203.jpg" },
-        { style: "Garden Shed", size: "10 x 16", price: "$4,105.00", serial: "gs-1016-121224-112-is", type: "new", img: "actual_images/gs-1016-121224-112-is.jpg" },
-        { style: "Utility Shed", size: "10 x 12", price: "$3,160.00", serial: "us-1012-070924-90-ic", type: "new", img: "actual_images/us-1012-070924-90-ic.jpg" },
-        { style: "Lofted Cabin (Repo)", size: "12 x 28", price: "$8,000.00", serial: "LC-1228-012224-125-IBP", type: "repo", img: "actual_images/image1.jpeg" },
-        { style: "Mini Barn", size: "12 x 24", price: "$5,740.00", serial: "MB-1224-01192026-0045", type: "new", img: "actual_images/image2.jpeg" },
-        { style: "Mini Barn", size: "12 x 12", price: "$3,820.00", serial: "MB-1212-01162026-0029", type: "new", img: "actual_images/image3.jpeg" },
-        { style: "Standard Dog Kennel (Repo)", size: "8 x 8", price: "$995.00", serial: "SDK880225202011D", type: "repo", img: "actual_images/image6.jpeg" },
-        { style: "Run-in Shelter", size: "10 x 12", price: "$3,160.00", serial: "RS-1012-01232026-0010", type: "new", img: "actual_images/image8.jpeg" },
-        { style: "Deluxe Dog Kennel", size: "8 x 12", price: "$4,765.00", serial: "DK-0812-012624-016-THS", type: "new", img: "actual_images/image9.png" },
-        { style: "Cabin", size: "12 x 24", price: "$8,722.00", serial: "C-1224-05202025-4451", type: "new", img: "actual_images/image10.jpeg" },
-        { style: "Lofted Cabin", size: "10 x 16", price: "$5,630.00", serial: "LC-1016-08524-581-IC", type: "new", img: "actual_images/LC-1016-08524-581-IC.jpg" },
-        { style: "Cabin", size: "12 x 24", price: "$7,790.00", serial: "C-1224-092624-106-IS", type: "new", img: "actual_images/C-1224-092624-106-IS.jpg" },
-        { style: "Garden Shed", size: "12 x 16", price: "$5,320.00", serial: "gs-1216-081624-290-cl", type: "new", img: "actual_images/gs-1216-081624-290-cl.jpg" },
-        { style: "Garden Shed (Repo)", size: "10 x 12", price: "$2,888.00", serial: "GS-1012-012623-THE-39", type: "repo", img: "actual_images/GS-1012-012623-THE-39.jpg" },
-        { style: "Garage (Repo)", size: "12 x 16", price: "$4,985.00", serial: "G-1216-030721-195-IK", type: "repo", img: "actual_images/G-1216-030721-195-IK.jpg" },
-        { style: "Garage (Repo)", size: "12 x 16", price: "$5,015.00", serial: "PG-1216-012023-THS-25", type: "repo", img: "actual_images/PG-1216-012023-THS-25.jpg" },
-        { style: "Garden Shed", size: "12 x 16", price: "$4,855.00", serial: "gs-1216-32823-023-ic", type: "new", img: "actual_images/gs-1216-32823-023-ic.jpg" },
-        { style: "Lofted Barn", size: "12 x 16", price: "$5,520.00", serial: "LB-1216-072624-579-IC", type: "new", img: "actual_images/LB-1216-072624-579-IC.jpg" },
-        { style: "Garden Shed", size: "8 x 12", price: "$2,990.00", serial: "GS-0812-04523-035-IC", type: "new", img: "actual_images/GS-0812-04523-035-IC.jpg" },
-        { style: "Garden Shed", size: "12 x 16", price: "$4,945.00", serial: "gs-1216-32923-028-ic", type: "new", img: "actual_images/gs-1216-32923-028-ic.jpg" },
-        { style: "Garden Shed", size: "10 x 12", price: "$3,295.00", serial: "gs-1012-111023-273-ic", type: "new", img: "actual_images/gs-1012-111023-273-ic.jpg" }
-    ];
+    {
+        "serial":  "C-1428-03122025-1621",
+        "type":  "repo",
+        "style":  "Cabin (Repo)",
+        "price":  ",995.00",
+        "img":  "actual_images/image1.jpeg",
+        "size":  "14 x 28"
+    },
+    {
+        "serial":  "MB-88-10302025-0114",
+        "type":  "new",
+        "style":  "Mini Barn",
+        "price":  ",040.00",
+        "img":  "actual_images/MB-88-10302025-0114-front.jpg",
+        "size":  "8 x 8"
+    },
+    {
+        "serial":  "US-817-10302025-0203",
+        "type":  "new",
+        "style":  "Utility Shed",
+        "price":  ",450.00",
+        "img":  "actual_images/image12.png",
+        "size":  "8 x 17"
+    },
+    {
+        "serial":  "gs-1010-121224-112-is",
+        "type":  "new",
+        "style":  "Garden Shed",
+        "price":  ",995.00",
+        "img":  "actual_images/image13.jpeg",
+        "size":  "10 x 10"
+    },
+    {
+        "serial":  "us1012-070924-90--ic",
+        "type":  "new",
+        "style":  "Utility Shed",
+        "price":  ",160.00",
+        "img":  "actual_images/us-1012-070924-90-ic.jpg",
+        "size":  "10 x 12"
+    },
+    {
+        "serial":  "LC-1228-012224-125-IBP",
+        "type":  "repo",
+        "style":  "Lofted Cabin (Repo)",
+        "price":  ",000.00",
+        "img":  "actual_images/image1.jpeg",
+        "size":  "12 x 28"
+    },
+    {
+        "serial":  "MB-1224-01192026-0045",
+        "type":  "new",
+        "style":  "Mini Barn",
+        "price":  ",740.00",
+        "img":  "actual_images/image2.jpeg",
+        "size":  "12 x 24"
+    },
+    {
+        "serial":  "MB-1212-01162026-0029",
+        "type":  "new",
+        "style":  "Mini Barn",
+        "price":  ",820.00",
+        "img":  "actual_images/image3.jpeg",
+        "size":  "12 x 12"
+    },
+    {
+        "serial":  "SDK8802252020110",
+        "type":  "repo",
+        "style":  "Standard Dog Kennel (Repo)",
+        "price":  ".00",
+        "img":  "actual_images/image6.jpeg",
+        "size":  "8 x 8"
+    },
+    {
+        "serial":  "RS-1012-01232028-0010",
+        "type":  "new",
+        "style":  "Run-in Shelter",
+        "price":  ",160.00",
+        "img":  "actual_images/image8.jpeg",
+        "size":  "10 x 12"
+    },
+    {
+        "serial":  "DK-0812-012624-016-THS",
+        "type":  "new",
+        "style":  "Deluxe Dog Kennel",
+        "price":  ",765.00",
+        "img":  "actual_images/image9.png",
+        "size":  "8 x 12"
+    },
+    {
+        "serial":  "C-1224-05202025-4451",
+        "type":  "new",
+        "style":  "Cabin",
+        "price":  ",722.00",
+        "img":  "actual_images/image10.jpeg",
+        "size":  "12 x 24"
+    },
+    {
+        "serial":  "LC-1016-08524-581-10",
+        "type":  "new",
+        "style":  "Lofted Cabin",
+        "price":  ",630.00",
+        "img":  "actual_images/LC-1016-08524-581-IC.jpg",
+        "size":  "10 x 16"
+    },
+    {
+        "serial":  "C1224-092624-106--IS",
+        "type":  "new",
+        "style":  "Cabin",
+        "price":  ",790.00",
+        "img":  "actual_images/C-1224-092624-106-IS.jpg",
+        "size":  "12 x 24"
+    },
+    {
+        "serial":  "gs-1216-081624-290-1",
+        "type":  "new",
+        "style":  "Garden Shed",
+        "price":  ",320.00",
+        "img":  "actual_images/gs-1216-081624-290-cl.jpg",
+        "size":  "12 x 16"
+    },
+    {
+        "serial":  "GS-1012-012623-THE-39",
+        "type":  "repo",
+        "style":  "Garden Shed (Repo)",
+        "price":  ",888.00",
+        "img":  "actual_images/GS-1012-012623-THE-39.jpg",
+        "size":  "10 x 12"
+    },
+    {
+        "serial":  "G1216-000721-195--IK",
+        "type":  "repo",
+        "style":  "Garage (Repo)",
+        "price":  ",965.00",
+        "img":  "actual_images/G-1216-030721-195-IK.jpg",
+        "size":  "12 x 16"
+    },
+    {
+        "serial":  "PG-1216-012023-THS-25",
+        "type":  "repo",
+        "style":  "Garage (Repo)",
+        "price":  ",015.00",
+        "img":  "actual_images/PG-1216-012023-THS-25.jpg",
+        "size":  "12 x 16"
+    },
+    {
+        "serial":  "gs-1216-32823-023-ic",
+        "type":  "new",
+        "style":  "Garden Shed",
+        "price":  ",855.00",
+        "img":  "actual_images/gs-1216-32823-023-ic.jpg",
+        "size":  "12 x 16"
+    },
+    {
+        "serial":  "LB-1216-072624-579-IC",
+        "type":  "new",
+        "style":  "Lofted Barn",
+        "price":  ",520.00",
+        "img":  "actual_images/LB-1216-072624-579-IC.jpg",
+        "size":  "12 x 16"
+    },
+    {
+        "serial":  "GS-0812-04523-035-IC",
+        "type":  "new",
+        "style":  "Garden Shed",
+        "price":  ",990.00",
+        "img":  "actual_images/GS-0812-04523-035-IC.jpg",
+        "size":  "8 x 12"
+    },
+    {
+        "serial":  "gs1216-32923-028--",
+        "type":  "new",
+        "style":  "Garden Shed",
+        "price":  ",945.00",
+        "img":  "actual_images/gs-1216-32923-028-ic.jpg",
+        "size":  "12 x 16"
+    },
+    {
+        "serial":  "gs1012-111023-273--",
+        "type":  "new",
+        "style":  "Garden Shed",
+        "price":  ",295.00",
+        "img":  "actual_images/gs-1012-111023-273-ic.jpg",
+        "size":  "10 x 12"
+    }
+];
 
     const grid = document.getElementById('inventory');
     buildings.forEach(b => {
@@ -98,3 +259,5 @@
 
 </body>
 </html>
+
+
