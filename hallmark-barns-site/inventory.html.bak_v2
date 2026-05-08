@@ -49,32 +49,40 @@
 
 <script>
     const buildings = [
-        { "style": "Utility Shed", "size": "8 x 8", "price": "$2,680.00", "serial": "US-88-01192026-0059", "type": "new", "img": "actual_images/utility_shed_8x8.png" },
-        { "style": "Deluxe Dog Kennel (Repo)", "size": "8 x 12", "price": "$2,995.00", "serial": "DDK-0812-091323-34-IS", "type": "repo", "img": "actual_images/deluxe_dog_kennel_repo_8x12_1.png" },
-        { "style": "Garden Shed", "size": "10 x 12", "price": "$3,200.00", "serial": "GS-1012-013123-THS-35", "type": "new", "img": "actual_images/garden_shed_10x12.png" },
-        { "style": "Garden Shed (Repo)", "size": "12 x 16", "price": "$4,720.00", "serial": "GS-1216-03142025-1747", "type": "repo", "img": "actual_images/garden_shed_repo_12x16.png" },
-        { "style": "Deluxe Dog Kennel (Repo)", "size": "8 x 12", "price": "$4,785.00", "serial": "DK-0812-012624-016-THS", "type": "repo", "img": "actual_images/deluxe_dog_kennel_repo_8x12_2.png" },
-        { "style": "Cabin", "size": "12 x 24", "price": "$8,722.00", "serial": "C-1224-05202025-4451", "type": "new", "img": "actual_images/cabin_12x24.png" },
-        { "style": "Mini Barn", "size": "8 x 8", "price": "$2,040.00", "serial": "MB-88-01192026-0046", "type": "new", "img": "actual_images/mini_barn_8x8.png" },
-        { "style": "Lofted Garden Shed", "size": "12 x 24", "price": "$7,050.00", "serial": "LGS-1224-121224-115-IS", "type": "new", "img": "actual_images/lofted_garden_shed_12x24.png" },
-        { "style": "Playhouse", "size": "8 x 12", "price": "$2,895.00", "serial": "P-812-01232026-0012", "type": "new", "img": "actual_images/playhouse_8x12.png" },
-        { "style": "Playhouse (Repo)", "size": "10 x 12", "price": "$3,495.00", "serial": "P-1012-060420-R", "type": "repo", "img": "actual_images/playhouse_repo_10x12.png" },
-        { "style": "Cabin (Repo)", "size": "14 x 28", "price": "$8,995.00", "serial": "C-1428-03122025-1621", "type": "repo", "img": "actual_images/C-1428-03122025-1621.jpg" },
-        { "style": "Mini Barn", "size": "12 x 24", "price": "$5,740.00", "serial": "MB-1224-01192026-0045", "type": "new", "img": "actual_images/MB-1224-01192026-0045.jpg" },
-        { "style": "Run-in Shelter", "size": "10 x 12", "price": "$3,160.00", "serial": "RS-1012-01232026-0010", "type": "new", "img": "actual_images/RS-1012-01232026-0010.jpg" },
-        { "style": "Cabin", "size": "11 x 24", "price": "$7,790.00", "serial": "C-1224-092624-106-IS", "type": "new", "img": "actual_images/C-1224-092624-106-IS.jpg" },
-        { "style": "Garden Shed", "size": "12 x 16", "price": "$4,855.00", "serial": "gs-1216-32823-023-ic", "type": "new", "img": "actual_images/gs-1216-32823-023-ic.jpg" },
-        { "style": "Lofted Barn", "size": "12 x 16", "price": "$5,520.00", "serial": "LB-1216-072624-579-IC", "type": "new", "img": "actual_images/LB-1216-072624-579-IC.jpg" },
-        { "style": "Garden Shed", "size": "12 x 16", "price": "$4,945.00", "serial": "gs-1216-32923-028-ic", "type": "new", "img": "actual_images/gs-1216-32923-028-ic.jpg" },
-        { "style": "Garden Shed", "size": "10 x 12", "price": "$3,295.00", "serial": "gs-1012-111023-273-ic", "type": "new", "img": "actual_images/gs-1012-111023-273-ic.jpg" }
+        { style: "Cabin (Repo)", size: "14 x 28", price: "$8,995", serial: "C-1428-03122025-1621", type: "repo" },
+        { style: "Mini Barn", size: "8 x 8", price: "$2,040", serial: "MB-88-10302025-0114", type: "new" },
+        { style: "Utility Shed", size: "8 x 12", price: "$2,990", serial: "US-817-10302025-0203", type: "new" },
+        { style: "Garden Shed", size: "10 x 16", price: "$4,105", serial: "gs-1010-121224-112-is", type: "new" },
+        { style: "Utility Shed", size: "10 x 12", price: "$3,160", serial: "us1012-070924-90--ic", type: "new" },
+        { style: "Lofted Cabin (Repo)", size: "12 x 28", price: "$8,000", serial: "LC-1228-012224-125-IBP", type: "repo" },
+        { style: "Mini Barn", size: "12 x 24", price: "$5,740", serial: "MB-1224-01192026-0045", type: "new" },
+        { style: "Mini Barn", size: "12 x 12", price: "$3,820", serial: "MB-1212-01162026-0029", type: "new" },
+        { style: "Lofted Garage", size: "12 x 16", price: "$4,995", serial: "LG-1216-05823-071-10", type: "new" },
+        { style: "Standard Dog Kennel (Repo)", size: "8 x 8", price: "$995", serial: "SDK8802252020110", type: "repo" },
+        { style: "Run-in Shelter", size: "10 x 12", price: "$3,160", serial: "RS-1012-01232028-0010", type: "new" },
+        { style: "Deluxe Dog Kennel", size: "8 x 12", price: "$4,785", serial: "DK-0812-012624-016-THS", type: "new" },
+        { style: "Cabin", size: "12 x 24", price: "$8,722", serial: "C-1224-05202025-4451", type: "new" },
+        { style: "Lofted Cabin", size: "10 x 16", price: "$5,630", serial: "LC-1016-08524-581-10", type: "new" },
+        { style: "Cabin", size: "12 x 24", price: "$7,790", serial: "C1224-092624-106--IS", type: "new" },
+        { style: "Garden Shed", size: "12 x 16", price: "$5,320", serial: "gs-1216-081624-290-1", type: "new" },
+        { style: "Garden Shed (Repo)", size: "10 x 12", price: "$2,888", serial: "GS-1012-012623-THE-39", type: "repo" },
+        { style: "Garage (Repo)", size: "12 x 16", price: "$4,965", serial: "G1216-000721-195--IK", type: "repo" },
+        { style: "Garage (Repo)", size: "12 x 16", price: "$5,015", serial: "PG-1216-012023-THS-25", type: "repo" },
+        { style: "Garden Shed", size: "12 x 16", price: "$4,855", serial: "gs-1216-32823-023-ic", type: "new" },
+        { style: "Lofted Barn", size: "12 x 16", price: "$5,520", serial: "LB-1216-072624-579-IC", type: "new" },
+        { style: "Garden Shed", size: "8 x 12", price: "$2,990", serial: "GS-0812-04523-035-IC", type: "new" },
+        { style: "Garden Shed", size: "12 x 16", price: "$4,945", serial: "gs1216-32923-028--", type: "new" },
+        { style: "Garden Shed", size: "10 x 12", price: "$3,295", serial: "gs1012-111023-273--", type: "new" }
     ];
 
     const grid = document.getElementById('inventory');
     buildings.forEach(b => {
         const card = document.createElement('div');
         card.className = 'unit-card';
+        // Auto-assign image path based on serial or fallback
+        const imgPath = `actual_images/${b.serial}.jpg`;
         card.innerHTML = `
-            <img src="${b.img}" class="unit-img" onerror="this.src='https://hallmarkbarns.com/wp-content/uploads/2023/11/hallmark-barns-utility-shed-scaled.jpg'">
+            <img src="${imgPath}" class="unit-img" onerror="this.src='https://hallmarkbarns.com/wp-content/uploads/2023/11/hallmark-barns-utility-shed-scaled.jpg'">
             <div class="unit-info">
                 <span class="badge ${b.type === 'repo' ? 'badge-repo' : 'badge-new'}">${b.type.toUpperCase()}</span>
                 <p class="unit-style">${b.style}</p>
