@@ -49,12 +49,11 @@
 
 <script>
     const buildings = [
-        { "style": "Utility Shed", "category": "Repo", "size": "8 x 16", "price": "$3,295.00", "serial": "US-816-06132025-5116", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSTRHRNK6879W2Q78N2ET05Q.jpg" },
-        { "style": "Mini Barn", "category": "New Inventory", "size": "10 x 20", "price": "$3,810.00", "serial": "MB-1020-04092026-0041", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSP4B1YF23GY7QG2TQG9P45F.jpg" },
-        { "style": "Lofted Garden Shed", "category": "New Inventory", "size": "10 x 16", "price": "$5,125.00", "serial": "LGS-1016-04152026-0029", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSP48SGVGT6PYTQF7XBMA3BJ.jpg" },
-        { "style": "Utility Shed", "category": "New Inventory", "size": "10 x 12", "price": "$3,160.00", "serial": "US-1012-04062026-0040", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSMWZ2TH02JD7ME8G4JHN89R.jpg" },
-        { "style": "Chicken Coop", "category": "New Inventory", "size": "6 x 8", "price": "$2,650.00", "serial": "CC-68-03242026-0047", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSMWWE86F1Q0T396FN2D35DK.jpg" },
-        { "style": "Garden Shed", "category": "Repo", "size": "12 x 16", "price": "$3,785.05", "serial": "GS-1216-03142025-1747", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/04/01KN9W22TMSSPHA3D14MDKBQ7C.jpg" },
+        { "style": "Lofted Garden Shed", "category": "New Inventory", "size": "12 x 32", "price": "$9,445.00", "serial": "LGS-1232-05042026-0017", "img": "https://dms.hallmarkbarns.com/storage/buildings/2026/05/01KQTA85KS7QWVD93VP03629NA.jpg" },
+        { "style": "Mini Barn", "category": "New Inventory", "size": "8 x 12", "price": "$2,560.00", "serial": "MB-812-04152026-0085", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KTEFM2BRS5ZSCKBJ9QCQPN1R.jpg" },
+        { "style": "Lofted Barn", "category": "Repo", "size": "12 x 16", "price": "$4,995.00", "serial": "LB-1216-LB-1216-100224-04-MI", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KTCBR7BFDFDK9XSARY42WHEA.jpg" },
+        { "style": "Cabin", "category": "Repo", "size": "12 x 20", "price": "$6,660.00", "serial": "C-1220-07252025-NRE", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KTA2AADMNP9M8K146FK3FJSY.jpg" },
+        { "style": "Deluxe Dog Kennel", "category": "Repo", "size": "12 x 12", "price": "$4,995.00", "serial": "DDK-1212-12312025-0092", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KTA2EQ0PRY2XYDP7KRX1BGBB.jpg" },
         { "style": "Lofted Cabin", "category": "New Inventory", "size": "12 x 28", "price": "$8,730.00", "serial": "LC-1228-03212026-0023", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KS7WJAM31DKHP4F9C0J0FEVD.jpg" },
         { "style": "Garage", "category": "New Inventory", "size": "12 x 16", "price": "$5,800.00", "serial": "PG-1216-03272026-0093", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KS0E22XGC6FQX05XP3NRFMVT.jpg" },
         { "style": "Garage", "category": "New Inventory", "size": "12 x 12", "price": "$5,040.00", "serial": "PG-1212-03272026-0094", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KS0E4SSWFEHRJJ9E6TXDBZQ1.jpg" },
@@ -67,13 +66,16 @@
         { "style": "Cabin", "category": "New Inventory", "size": "12 x 24", "price": "$8,722.00", "serial": "C-1224-05202025-4451", "img": "https://dms.hallmarkbarns.com/storage/buildings/2025/09/01K5MERGWTKGMY8486KVFZY4E2.jpg" },
         { "style": "Lofted Garden Shed", "category": "New Inventory", "size": "12 x 24", "price": "$7,050.00", "serial": "LGS-1224-02282026-0034", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/04/01KNQ0F19EW0WV9DFVMTX2SPVT.jpg" },
         { "style": "Playhouse", "category": "New Inventory", "size": "8 x 12", "price": "$2,995.00", "serial": "P-812-02282026-0014", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/04/01KNC9ABEEHT8VE2PXP2PMGE77.jpg" },
-        { "style": "Cabin", "category": "Repo", "size": "14 x 28", "price": "$8,995.00", "serial": "C-1428-03122025-1621", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/03/01KKHJTPVF5MZ7HE3RKRD76XXE.jpg" },
         { "style": "Mini Barn", "category": "New Inventory", "size": "12 x 24", "price": "$5,740.00", "serial": "MB-1224-01192026-0045", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/02/01KHYKEYEE785X8G50XHQ87M4T.jpg" },
         { "style": "Cabin", "category": "New Inventory", "size": "12 x 24", "price": "$7,790.00", "serial": "C-1224-092624-106-IS", "img": "https://dms.hallmarkbarns.com/storage/buildings/2025/09/01K5MH31R9JZV4N8ZHHT1EMKRW.jpg" },
         { "style": "Garden Shed", "category": "New Inventory", "size": "12 x 16", "price": "$4,855.00", "serial": "gs-1216-32823-023-ic", "img": "https://dms.hallmarkbarns.com/storage/buildings/2025/10/01K77R86NNXQ19Y6GK2D4HAKB1.jpg" },
         { "style": "Lofted Barn", "category": "New Inventory", "size": "12 x 16", "price": "$5,520.00", "serial": "LB-1216-072624-579-IC", "img": "https://dms.hallmarkbarns.com/storage/buildings/2025/10/01K77RMMRFQQGJXF16PEMFAGX7.jpg" },
         { "style": "Garden Shed", "category": "New Inventory", "size": "12 x 16", "price": "$4,945.00", "serial": "gs-1216-32923-028-ic", "img": "https://dms.hallmarkbarns.com/storage/buildings/2025/10/01K7F4JDYN0396V41EVWVPSZVZ.jpg" },
-        { "style": "Garden Shed", "category": "New Inventory", "size": "10 x 12", "price": "$3,295.00", "serial": "gs-1012-111023-273-ic", "img": "https://dms.hallmarkbarns.com/storage/buildings/2026/02/01KJ84D9ASE3WKB1K2A5AVT2AJ.jpg" }
+        { "style": "Garden Shed", "category": "New Inventory", "size": "10 x 12", "price": "$3,295.00", "serial": "gs-1012-111023-273-ic", "img": "https://dms.hallmarkbarns.com/storage/buildings/2026/02/01KJ84D9ASE3WKB1K2A5AVT2AJ.jpg" },
+        { "style": "Utility Shed", "category": "New Inventory", "size": "10 x 12", "price": "$3,160.00", "serial": "US-1012-04062026-0040", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSMWZ2TH02JD7ME8G4JHN89R.jpg" },
+        { "style": "Chicken Coop", "category": "New Inventory", "size": "6 x 8", "price": "$2,650.00", "serial": "CC-68-03242026-0047", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSMWWE86F1Q0T396FN2D35DK.jpg" },
+        { "style": "Mini Barn", "category": "New Inventory", "size": "10 x 20", "price": "$3,810.00", "serial": "MB-1020-04092026-0041", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSP4B1YF23GY7QG2TQG9P45F.jpg" },
+        { "style": "Lofted Garden Shed", "category": "New Inventory", "size": "10 x 16", "price": "$5,125.00", "serial": "LGS-1016-04152026-0029", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSP48SGVGT6PYTQF7XBMA3BJ.jpg" }
     ];
 
     const grid = document.getElementById('inventory');
