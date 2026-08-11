@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Shed Configurator | Hallmark Spencer</title>
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- OrbitControls -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1e293b;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --bg: #f8fafc;
+            --sidebar-width: 380px;
+        }
+
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Inter', sans-serif; background: #eee; overflow: hidden; }
+
+        #container { display: flex; height: 100vh; }
+        #canvas-container { flex-grow: 1; position: relative; background: radial-gradient(#ffffff, #cbd5e1); }
+        
+        #sidebar {
+            width: var(--sidebar-width);
+            background: white;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+        .logo-area img { height: 40px; }
+
+        h2 { margin: 0; color: var(--primary); font-weight: 800; font-size: 1.25rem; }
+        
+        .section-title {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 1.5rem 0 0.75rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .section-title::after { content: ''; flex-grow: 1; height: 1px; background: #e2e8f0; }
+
+        .control-group { margin-bottom: 1rem; }
+        
+        select, button {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 2px solid #f1f5f9;
+            font-family: inherit;
+            font-size: 0.95rem;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        select:hover { border-color: var(--accent); }
+        select:focus { outline: none; border-color: var(--accent); background: white; }
+
+        .price-card {
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px;
+            margin-top: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .price-label { font-size: 0.75rem; opacity: 0.7; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+        .price-value { font-size: 2.5rem; font-weight: 800; margin: 0.5rem 0; color: var(--accent); }
+
+        .color-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+        .color-box {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 3px solid #f1f5f9;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .color-box:hover { transform: translateY(-2px); border-color: #cbd5e1; }
+        .color-box.active { border-color: var(--accent); transform: scale(1.05); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .color-box.active::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: 800;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        #loading-overlay {
+            position: absolute; top:0; left:0; right:0; bottom:0;
+            background: white; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; transition: opacity 0.5s;
+        }
+
+        .loader {
+            width: 48px; height: 48px; border: 5px solid #f3f3f3; border-top: 5px solid var(--accent);
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .back-btn {
+            position: absolute; top: 1.5rem; left: 1.5rem;
+            background: rgba(255,255,255,0.9); backdrop-filter: blur(4px); border: none; padding: 0.75rem 1.25rem; border-radius: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); cursor: pointer; font-weight: 700;
+            display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--primary);
+            z-index: 1000; transition: transform 0.2s;
+        }
+        .back-btn:hover { transform: translateX(-5px); }
+
+        .option-row {
+            display: flex; align-items: center; gap: 12px; padding: 10px;
+            border-radius: 8px; transition: background 0.2s; cursor: pointer;
+        }
+        .option-row:hover { background: #f1f5f9; }
+        .option-row input { width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer; }
+        .option-row label { flex-grow: 1; cursor: pointer; font-size: 0.9rem; color: #334155; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+<div id="container">
+    <div id="canvas-container">
+        <a href="index.html" class="back-btn">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            BACK TO SITE
+        </a>
+        <div id="loading-overlay">
+            <div class="loader"></div>
+            <h3 style="color: var(--primary); font-weight: 800;">BUILDING YOUR SHED...</h3>
+        </div>
+    </div>
+
+    <div id="sidebar">
+        <div class="logo-area">
+            <img src="https://hallmarkbarns.com/wp-content/uploads/2023/11/hallmark-logo.png" alt="Hallmark Spencer">
+            <h2>DESIGNER</h2>
+        </div>
+
+        <div class="section-title">Base Configuration</div>
+        <div class="control-group">
+            <select id="style-select"></select>
+        </div>
+        <div class="control-group">
+            <select id="size-select"></select>
+        </div>
+
+        <div class="section-title">Siding & Colors</div>
+        <div class="control-group">
+            <div id="siding-colors" class="color-grid"></div>
+        </div>
+
+        <div class="section-title">Roofing & Trim</div>
+        <div class="control-group">
+            <div id="roof-colors" class="color-grid"></div>
+        </div>
+
+        <div class="section-title">Doors & Windows</div>
+        <div id="options-list"></div>
+
+        <div class="price-card">
+            <div class="price-label">Estimated Total</div>
+            <div id="price-display" class="price-value">$0.00</div>
+            <button style="background: var(--accent); color: white; border: none; font-weight: 800; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);">SEND ME A QUOTE</button>
+            <p style="font-size: 0.65rem; margin-top: 1rem; opacity: 0.6;">*Prices are estimates and exclude tax/delivery.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- INLINED DATA ---
+    const pricingData = {
+        "Cabin": {"8 x 12": 3494, "8 x 16": 4402, "8 x 20": 5504, "8 x 24": 6719, "10 x 16": 5386, "10 x 20": 5810, "10 x 24": 6805, "10 x 26": 7369, "12 x 16": 6665, "12 x 20": 7095, "12 x 24": 8084, "12 x 26": 8509, "12 x 28": 8869, "12 x 30": 9218, "12 x 32": 9643, "12 x 34": 10067, "12 x 36": 10492, "12 x 38": 10922, "12 x 40": 11347, "14 x 24": 9438, "14 x 28": 10352, "14 x 32": 11202, "14 x 36": 12051, "14 x 40": 12766, "16 x 24": 10777, "16 x 28": 11992, "16 x 32": 12766, "16 x 36": 13475, "16 x 40": 14185},
+        "Chicken Coop": {"6 x 8": 2849, "8 x 8": 2956, "8 x 10": 3451, "8 x 12": 3972, "8 x 16": 4966, "10 x 12": 4966, "10 x 16": 5692, "10 x 20": 7412},
+        "Deluxe Dog Kennel": {"8 x 12": 4510, "10 x 12": 5671, "10 x 16": 6418, "10 x 20": 6875, "12 x 12": 5821, "12 x 16": 6455, "12 x 20": 7090, "12 x 24": 7718, "12 x 28": 8347, "12 x 32": 8987, "12 x 36": 9610, "12 x 40": 10245, "14 x 16": 7530, "14 x 24": 9003, "14 x 28": 9740, "14 x 32": 11030, "14 x 36": 12406, "14 x 40": 13835, "16 x 16": 8487, "16 x 24": 10288, "16 x 28": 11137, "16 x 32": 12610, "16 x 40": 15808},
+        "Garage": {"12 x 12": 5418, "12 x 16": 6235, "12 x 20": 7090, "12 x 24": 7654, "12 x 28": 8224, "12 x 30": 8509, "12 x 32": 8794, "12 x 34": 9412, "12 x 36": 10003, "12 x 40": 10573, "14 x 20": 8595, "14 x 24": 9218, "14 x 28": 9928, "14 x 32": 10637, "14 x 36": 11632, "14 x 40": 12620, "16 x 24": 10212, "16 x 28": 10997, "16 x 32": 11718, "16 x 36": 12986, "16 x 40": 14185},
+        "Garden Shed": {"6 x 8": 2935, "8 x 8": 2978, "8 x 12": 3214, "8 x 16": 3687, "8 x 20": 4397, "10 x 12": 3542, "10 x 16": 4252, "10 x 20": 5015, "10 x 24": 5784, "12 x 12": 4370, "12 x 16": 5101, "12 x 20": 6031, "12 x 24": 6934, "12 x 28": 7783, "12 x 32": 8154, "12 x 34": 8546, "12 x 36": 9078, "12 x 40": 9933, "14 x 24": 8444, "14 x 28": 9116, "14 x 32": 9928, "14 x 36": 11347, "14 x 40": 12056, "16 x 24": 9826, "16 x 28": 10637, "16 x 32": 11486, "16 x 36": 12341, "16 x 40": 13190},
+        "Lofted Barn": {"8 x 10": 3435, "8 x 12": 3542, "8 x 16": 3865, "8 x 20": 4257, "10 x 12": 4187, "10 x 16": 5155, "10 x 20": 6122, "10 x 24": 7090, "12 x 12": 4832, "12 x 16": 5934, "12 x 20": 6461, "12 x 24": 7310, "12 x 28": 8159, "12 x 32": 8880, "12 x 36": 9718, "12 x 40": 10573, "14 x 20": 9293, "14 x 24": 9863, "14 x 28": 10573, "14 x 32": 11384, "14 x 36": 11992, "14 x 40": 12481, "16 x 24": 10105, "16 x 28": 10858, "16 x 32": 11782, "16 x 36": 12766, "16 x 40": 14185},
+        "Mini Barn": {"8 x 8": 2193, "8 x 10": 2446, "8 x 12": 2623, "8 x 16": 3053, "10 x 12": 3160, "10 x 16": 3676, "10 x 20": 4096, "10 x 24": 4515, "12 x 12": 4106, "12 x 16": 4536, "12 x 20": 5429, "12 x 24": 6170, "12 x 32": 7735},
+        "Utility Shed": {"6 x 8": 2827, "8 x 8": 2881, "8 x 10": 2999, "8 x 12": 3118, "8 x 16": 3607, "10 x 10": 3187, "10 x 12": 3397, "10 x 16": 4106, "10 x 20": 4816, "10 x 24": 5590, "12 x 12": 4252, "12 x 16": 4961, "12 x 20": 5950, "12 x 24": 6810, "12 x 32": 8224, "12 x 34": 8428, "12 x 36": 8729, "12 x 40": 9008, "14 x 24": 7944, "14 x 28": 8799, "14 x 32": 9648, "14 x 36": 10497, "14 x 40": 11492, "16 x 20": 8509, "16 x 24": 9084, "16 x 28": 10003, "16 x 32": 10997, "16 x 36": 11846, "16 x 40": 12841},
+        "Door": {"36\" Barn Door": 150, "36\" Entry Door": 530, "72\" x 72\" Double Door (Std)": 250, "9' x 7' Rollup Garage Door": 850},
+        "Window": {"18\" x 27\" Window": 85, "2' x 3' White Window": 90, "3' x 3' White Window": 110},
+        "Accessory": {"3' x 5' Ramp": 175, "6' x 5' Ramp": 225, "9' x 5' Ramp": 275, "Workbench (24\")": 9}
+    };
+
+    const colors = [
+        { name: 'Crimson Red', hex: '#8b0000' },
+        { name: 'Charcoal', hex: '#333333' },
+        { name: 'Light Gray', hex: '#cccccc' },
+        { name: 'Tan', hex: '#d2b48c' },
+        { name: 'White', hex: '#ffffff' },
+        { name: 'Hunter Green', hex: '#006400' },
+        { name: 'Blue', hex: '#0000ff' },
+        { name: 'Brown', hex: '#8b4513' },
+        { name: 'Clay', hex: '#a5a58d' },
+        { name: 'Black', hex: '#000000' }
+    ];
+
+    // --- 3D ENGINE ---
+    let scene, camera, renderer, controls, shed;
+    let components = { walls: null, roof: null, door: null };
+    const textureLoader = new THREE.TextureLoader();
+
+    function init3D() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(45, (window.innerWidth - 380) / window.innerHeight, 0.1, 1000);
+        camera.position.set(15, 12, 15);
+
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth - 380, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.maxPolarAngle = Math.PI / 2.1; // Prevent going underground
+
+        // Lighting
+        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+        const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+        sun.position.set(10, 20, 10);
+        sun.castShadow = true;
+        scene.add(sun);
+
+        // Ground
+        const grid = new THREE.GridHelper(60, 40, 0x94a3b8, 0xe2e8f0);
+        grid.position.y = 0;
+        scene.add(grid);
+
+        createShed();
+        animate();
+        
+        document.getElementById('loading-overlay').style.opacity = 0;
+        setTimeout(() => document.getElementById('loading-overlay').remove(), 500);
+    }
+
+    function createShed() {
+        if (shed) scene.remove(shed);
+        shed = new THREE.Group();
+
+        // Wall Material (LP SmartSide Style)
+        const wallMat = new THREE.MeshStandardMaterial({ 
+            color: '#cccccc',
+            roughness: 0.8,
+            metalness: 0.1
+        });
+
+        const wallGeom = new THREE.BoxGeometry(10, 8, 16);
+        components.walls = new THREE.Mesh(wallGeom, wallMat);
+        components.walls.position.y = 4;
+        components.walls.castShadow = true;
+        components.walls.receiveShadow = true;
+        shed.add(components.walls);
+
+        // Roof Material (Metal Style)
+        const roofMat = new THREE.MeshStandardMaterial({ 
+            color: '#333333',
+            roughness: 0.5,
+            metalness: 0.5
+        });
+
+        const roofGeom = new THREE.ConeGeometry(7.2, 3.5, 4);
+        roofGeom.rotateY(Math.PI / 4);
+        components.roof = new THREE.Mesh(roofGeom, roofMat);
+        components.roof.position.y = 9.75;
+        components.roof.scale.set(1, 1, 16 / 7.2);
+        components.roof.castShadow = true;
+        shed.add(components.roof);
+
+        // Simple procedural door
+        const doorGeom = new THREE.PlaneGeometry(3, 6);
+        const doorMat = new THREE.MeshStandardMaterial({ color: '#ffffff', side: THREE.DoubleSide });
+        components.door = new THREE.Mesh(doorGeom, doorMat);
+        components.door.position.set(5.01, 3, 0); // Side of building
+        components.door.rotateY(Math.PI / 2);
+        shed.add(components.door);
+
+        scene.add(shed);
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+    }
+
+    // --- UI LOGIC ---
+    function setupUI() {
+        const styleSelect = document.getElementById('style-select');
+        const sizeSelect = document.getElementById('size-select');
+
+        // Styles
+        Object.keys(pricingData).forEach(style => {
+            if (['Door', 'Window', 'Accessory', 'Premium'].includes(style)) return;
+            const opt = document.createElement('option');
+            opt.value = style;
+            opt.innerText = style;
+            styleSelect.appendChild(opt);
+        });
+
+        styleSelect.addEventListener('change', () => {
+            updateSizes(styleSelect.value);
+            updatePrice();
+        });
+
+        // Initial sizes
+        updateSizes(styleSelect.value);
+
+        // Colors
+        const sidingGrid = document.getElementById('siding-colors');
+        const roofGrid = document.getElementById('roof-colors');
+
+        colors.forEach(c => {
+            const sBox = document.createElement('div');
+            sBox.className = 'color-box';
+            sBox.style.backgroundColor = c.hex;
+            if (c.name === 'Light Gray') sBox.classList.add('active');
+            sBox.onclick = () => {
+                components.walls.material.color.set(c.hex);
+                document.querySelectorAll('#siding-colors .color-box').forEach(el => el.classList.remove('active'));
+                sBox.classList.add('active');
+            };
+            sidingGrid.appendChild(sBox);
+
+            const rBox = document.createElement('div');
+            rBox.className = 'color-box';
+            rBox.style.backgroundColor = c.hex;
+            if (c.name === 'Charcoal') rBox.classList.add('active');
+            rBox.onclick = () => {
+                components.roof.material.color.set(c.hex);
+                document.querySelectorAll('#roof-colors .color-box').forEach(el => el.classList.remove('active'));
+                rBox.classList.add('active');
+            };
+            roofGrid.appendChild(rBox);
+        });
+
+        // Options
+        const optList = document.getElementById('options-list');
+        ['9\' x 7\' Rollup Garage Door', '3\' x 5\' Ramp', '3\' x 3\' White Window'].forEach(optName => {
+            const row = document.createElement('div');
+            row.className = 'option-row';
+            
+            const chk = document.createElement('input');
+            chk.type = 'checkbox'; chk.id = 'opt-' + optName;
+            chk.onchange = (e) => {
+                updatePrice();
+                // Visual feedback in 3D for door
+                if (optName.includes('Garage')) components.door.visible = !e.target.checked;
+            };
+            
+            const lbl = document.createElement('label');
+            lbl.htmlFor = 'opt-' + optName; lbl.innerText = optName;
+            
+            row.appendChild(chk); row.appendChild(lbl);
+            optList.appendChild(row);
+        });
+
+        sizeSelect.addEventListener('change', updatePrice);
+        updatePrice();
+    }
+
+    function updateSizes(style) {
+        const sizeSelect = document.getElementById('size-select');
+        sizeSelect.innerHTML = '';
+        const sizes = pricingData[style];
+        Object.keys(sizes).forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s; opt.innerText = s;
+            sizeSelect.appendChild(opt);
+        });
+    }
+
+    function updatePrice() {
+        const style = document.getElementById('style-select').value;
+        const size = document.getElementById('size-select').value;
+        let total = pricingData[style][size] || 0;
+
+        document.querySelectorAll('#options-list input:checked').forEach(cb => {
+            const name = cb.id.replace('opt-', '');
+            total += (pricingData.Door[name] || pricingData.Window[name] || pricingData.Accessory[name] || 0);
+        });
+
+        document.getElementById('price-display').innerText = '$' + total.toLocaleString(undefined, {minimumFractionDigits: 2});
+        
+        // Update 3D Scale
+        const dims = size.split(' x ').map(v => parseInt(v));
+        if (dims.length === 2 && components.walls) {
+            components.walls.scale.set(dims[0]/10, 1, dims[1]/16);
+            components.roof.scale.set(dims[0]/10, 1, dims[1]/11.2);
+            // Move door based on size
+            components.door.position.x = (dims[0]/2) + 0.01;
+        }
+    }
+
+    window.addEventListener('load', () => {
+        init3D();
+        setupUI();
+    });
+
+    window.onresize = () => {
+        camera.aspect = (window.innerWidth - 380) / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth - 380, window.innerHeight);
+    };
+</script>
+
+</body>
+</html>
