@@ -3,235 +3,221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hallmark Spencer | Authorized Dealer Jared Baker</title>
+    <title>Hallmark Spencer | Premium Portable Buildings & Custom Decks</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2c3e50;
-            --accent: #e67e22; /* Warm wood/construction tone */
-            --steel: #3498db; /* Steel blue */
-            --deck: #8e44ad; /* Deck purple/wood tone */
-            --light: #ecf0f1;
-            --dark: #34495e;
+            --primary: #1a1a1a;
+            --secondary: #2c3e50;
+            --accent: #f39c12;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --light: #f4f4f4;
+            --white: #ffffff;
         }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
+            font-family: 'Open Sans', sans-serif;
             margin: 0;
-            padding: 0;
-            color: #333;
-            background-color: #f9f9f9;
+            background: var(--light);
+            color: var(--primary);
+            overflow-x: hidden;
         }
-        header {
-            background-color: var(--primary);
-            color: white;
-            padding: 1rem 0;
-            text-align: center;
-        }
-        nav ul {
-            list-style: none;
-            padding: 0;
+
+        h1, h2, h3 { font-family: 'Montserrat', sans-serif; text-transform: uppercase; }
+
+        /* Navigation */
+        nav {
+            background: rgba(0,0,0,0.8);
+            padding: 1rem 5%;
+            position: fixed;
+            width: 90%;
+            top: 0;
+            z-index: 1000;
             display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(5px);
         }
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
+
+        .logo-text { color: var(--accent); font-weight: 900; font-size: 1.5rem; text-decoration: none; }
+
+        nav ul { list-style: none; display: flex; gap: 2rem; margin: 0; }
+        nav a { color: var(--white); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: color 0.3s; }
+        nav a:hover { color: var(--accent); }
+
+        /* Hero Section */
         .hero {
-            background-color: var(--primary);
-            color: white;
-            padding: 80px 20px;
+            height: 90vh;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('actual_images/site-hero.png') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
+            color: var(--white);
+            padding: 0 1rem;
         }
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-        }
-        .hero p {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
-        }
-        .cta-button {
-            background-color: var(--accent);
-            color: white;
-            padding: 15px 30px;
+
+        .hero h1 { font-size: 4rem; margin: 0; font-weight: 900; letter-spacing: -2px; }
+        .hero p { font-size: 1.5rem; max-width: 800px; margin: 1rem 0 2.5rem; font-weight: 400; }
+
+        /* Dynamic Buttons */
+        .btn-container { display: flex; gap: 1.5rem; flex-wrap: wrap; justify-content: center; }
+
+        .btn {
+            padding: 1.2rem 2.5rem;
+            border-radius: 50px;
             text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 1.2rem;
-            transition: background 0.3s;
-            display: inline-block;
-            margin: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-transform: uppercase;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
         }
-        .cta-button:hover {
-            background-color: #d35400;
-        }
-        .cta-button.steel {
-            background-color: var(--steel);
-        }
-        .cta-button.steel:hover {
-            background-color: #2980b9;
-        }
-        .features {
+
+        .btn:hover { transform: translateY(-5px) scale(1.05); box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
+
+        .btn-accent { background: var(--accent); color: var(--white); }
+        .btn-success { background: var(--success); color: var(--white); }
+        .btn-outline { border: 2px solid var(--white); color: var(--white); }
+        .btn-outline:hover { background: var(--white); color: var(--primary); }
+
+        /* Click Bait Badges */
+        .badge-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 2rem;
-            padding: 4rem 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
+            padding: 4rem 5%;
+            background: var(--white);
         }
-        .feature-card {
-            background: white;
+
+        .badge-card {
+            text-align: center;
             padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-top: 5px solid var(--primary);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 15px;
+            background: var(--light);
+            transition: 0.3s;
+            cursor: pointer;
+            border-bottom: 5px solid transparent;
         }
-        .feature-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
-        }
-        .cta-button {
-            background-color: var(--accent);
-            color: white;
-            padding: 15px 30px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 1.2rem;
-            transition: transform 0.2s, background 0.3s, box-shadow 0.3s;
+
+        .badge-card:hover { border-bottom-color: var(--accent); transform: scale(1.03); }
+        .badge-card h3 { color: var(--danger); font-size: 1.8rem; margin: 0; }
+        .badge-card p { font-weight: 700; margin: 0.5rem 0; }
+
+        /* Category Sections */
+        .section-split { display: flex; flex-wrap: wrap; min-height: 600px; }
+        .split-content { flex: 1; min-width: 350px; padding: 5rem 10%; display: flex; flex-direction: column; justify-content: center; }
+        .split-image { flex: 1; min-width: 350px; background-size: cover; background-position: center; }
+
+        .bg-dark { background: var(--secondary); color: var(--white); }
+        
+        .price-splash {
+            background: var(--danger);
+            color: var(--white);
             display: inline-block;
-            margin: 10px;
+            padding: 0.5rem 1rem;
+            font-weight: 900;
+            transform: rotate(-3deg);
+            margin-bottom: 1rem;
         }
-        .cta-button:hover {
-            background-color: #d35400;
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .features > div {
-            animation: fadeIn 0.8s ease-out forwards;
+
+        /* Footer */
+        footer { background: var(--primary); color: #888; padding: 4rem 5%; text-align: center; }
+        .contact-pill { display: inline-block; background: #333; color: var(--accent); padding: 1rem 2rem; border-radius: 50px; font-weight: 700; margin-top: 1rem; text-decoration: none; }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1.1rem; }
+            .btn { width: 100%; text-align: center; }
         }
     </style>
 </head>
 <body>
 
-<header style="background-color: var(--primary); color: white; padding: 0; text-align: center;">
-    <div style="width: 100%; position: relative;">
-        <img src="actual_images/front-website-hero.jpg" alt="Hallmark Spencer Lot" style="width: 100%; height: auto; display: block; max-height: none;">
-        <div style="background: rgba(44, 62, 80, 0.9); padding: 20px; border-bottom: 3px solid var(--accent);">
-            <h1 style="margin: 0; font-size: 2.5rem; letter-spacing: 1px;">Hallmark Spencer</h1>
-            <p style="font-size: 1.2rem; margin: 5px 0 0 0; opacity: 0.9;">Authorized Dealer: Jared Baker</p>
-        </div>
-    </div>
-    <nav style="background-color: var(--primary); padding: 1rem 0;">
-        <ul>
-            <li><a href="#buildings">Portable Buildings</a></li>
-            <li><a href="#carports">Steel Carports</a></li>
-            <li><a href="#decks">Timbercraft Decks</a></li>
-            <li><a href="#contact">Contact</a></li>
-        </ul>
-    </nav>
-</header>
+<nav>
+    <a href="index.html" class="logo-text">HALLMARK SPENCER</a>
+    <ul>
+        <li><a href="https://hallmarkbarns.com/builder/" target="_blank">3D SHED BUILDER</a></li>
+        <li><a href="decks.html">DESIGN A DECK</a></li>
+        <li><a href="inventory.html">LOT INVENTORY</a></li>
+        <li><a href="order-rto.html">RENT-TO-OWN</a></li>
+    </ul>
+</nav>
 
-<section class="hero" style="padding: 60px 20px;">
-    <h1>Quality Structures, Built to Last</h1>
-    <p>Your one-stop shop for Barns, Custom Carports, and Premium Decks.</p>
-    <a href="tel:+13173705720" class="cta-button" style="background-color: #27ae60;">📞 Call Jared Now</a>
-    <a href="inventory.html" class="cta-button" style="background-color: #f39c12;">🏷️ Current Lot Inventory</a>
-    <a href="order-rto.html" class="cta-button">📝 Start Rent-to-Own</a>
-    <a href="order.html" class="cta-button" style="background-color: #95a5a6;">💵 Start Cash Order</a>
-    <a href="https://hallmarkbarns.com/builder/" class="cta-button" target="_blank">Design Your Shed 3D</a>
-    <a href="https://build.americansteelinc.com/dealer/?dealer=SV006474" class="cta-button steel" target="_blank">Design Your Carport 3D</a>
-</section>
-
-<section class="features" id="buildings">
-    <!-- Hallmark Barns -->
-    <div class="feature-card" style="border-top-color: #e67e22;">
-        <div style="text-align: center; margin-bottom: 15px;">
-            <img src="actual_images/hallmark-portable-buildings.png" alt="Hallmark Lofted Barn" style="width: 100%; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        </div>
-        <h3>🏠 Hallmark Portable Buildings</h3>
-        <p>Premium storage solutions built to your specs. From compact 8x8 sheds to massive 16x40 cabins.</p>
-        <div style="text-align: center; margin-bottom: 15px;">
-            <a href="order-rto.html" class="cta-button" style="width: 80%; font-size: 1rem;">Start Rent-to-Own Order</a>
-            <p style="font-size: 0.8rem; margin-top: 5px;">(No Credit Checks Ever!)</p>
-        </div>
-        <ul>
-            <li><strong>Styles:</strong> Lofted Barns, Utility Sheds, Garages, Cabins, Chicken Coops.</li>
-            <li><strong>Rent-to-Own:</strong> Flexible payment options available.</li>
-            <li><strong>Customizable:</strong> Windows, doors, ramps, and insulated floors.</li>
-        </ul>
-        <p><em>"You Imagine It. We Build It."</em></p>
-    </div>
-
-    <!-- American Steel Carports -->
-    <div class="feature-card" id="carports" style="border-top-color: #3498db;">
-        <div style="text-align: center; margin-bottom: 15px;">
-            <img src="actual_images/american-steel-carport.png" alt="American Steel Carport" style="width: 100%; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        </div>
-        <h3>🚗 American Steel Carports</h3>
-        <p>Industry-leading steel structures with 20+ years of experience.</p>
-        <ul>
-            <li><strong>20-Year Warranty:</strong> Frame & Rust-through coverage.</li>
-            <li><strong>Wind Rated:</strong> Lifetime 100 MPH wind warranty.</li>
-            <li><strong>Products:</strong> Carports, RV Covers, Workshops, Barns.</li>
-            <li><strong>Financing:</strong> Rates as low as 9.99% APR.</li>
-        </ul>
-        <div style="text-align: center; margin-top: 20px;">
-            <a href="https://build.americansteelinc.com/dealer/?dealer=SV006474" class="cta-button steel" style="width: 80%; font-size: 1rem;" target="_blank">Start 3D Builder & Quote</a>
-            <p style="font-size: 0.9rem; margin-top: 10px;">(Design your custom structure instantly)</p>
-        </div>
-    </div>
-
-    <!-- Timbercraft Decks -->
-    <div class="feature-card" id="decks" style="border-top-color: #8e44ad;">
-        <div style="text-align: center; margin-bottom: 15px;">
-            <img src="actual_images/decks/10x10-garden.png" alt="10x10 Timbercraft Patio Deck" style="width: 100%; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <p style="font-size: 0.9rem; font-style: italic; margin-top: 8px;">10' x 10' Timbercraft Deck in a garden setting</p>
-        </div>
-        <h3>🔨 Timbercraft Decks</h3>
-        <p>Hand-crafted decks. Expand your outdoor living space with premium wood construction.</p>
-        <div style="text-align: center; margin-bottom: 15px;">
-            <a href="decks.html" class="cta-button" style="width: 80%; font-size: 1.1rem; background-color: var(--deck); border: 2px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">🔨 View Decks & Pricing</a>
-        </div>
-        <ul>
-            <li><strong>Sizes:</strong> 8x8, 10x10, 10x12, 8x16, 12x24, and Custom.</li>
-            <li><strong>Options:</strong> Available with or without a roof.</li>
-            <li><strong>Premium Stains:</strong> Mahogany, Burnt Hickory, Natural Cedar, Pewter Gray.</li>
-            <li><strong>Sample Pricing (8'x12' Model):</strong>
-                <ul>
-                    <li>No Roof: <span class="price-tag">$2,795.82</span></li>
-                    <li>With Roof: <span class="price-tag">$3,994</span></li>
-                </ul>
-            </li>
-            <li><strong>Rent-to-Own:</strong> Available on all stained models!</li>
-        </ul>
-        <p><em>"Quality craftsmanship that transforms your backyard."</em></p>
+<section class="hero">
+    <div class="price-splash">LIMITED TIME: NEW INVENTORY ARRIVING DAILY!</div>
+    <h1>STOP SETTLING. START STORING.</h1>
+    <p>Spencer's premier destination for Hallmark structures, American Steel carports, and high-end Timbercraft decks.</p>
+    <div class="btn-container">
+        <a href="inventory.html" class="btn btn-accent">🔥 BROWSE HOT DEALS</a>
+        <a href="https://hallmarkbarns.com/builder/" target="_blank" class="btn btn-success">🏠 3D SHED BUILDER</a>
+        <a href="decks.html" class="btn btn-outline">🔨 DESIGN A DECK</a>
     </div>
 </section>
 
-<section style="background-color: #ecf0f1; padding: 4rem 2rem; text-align: center;" id="contact">
-    <h2>Ready to Get Started?</h2>
-    <p>Contact Jared Baker directly for quotes, questions, or to place an order.</p>
-    <br>
-    <a href="tel:+13173705720" class="cta-button" style="background-color: #27ae60;">📞 (317) 370-5720</a>
-    <a href="mailto:jbaker154@gmail.com" class="cta-button">✉️ Email Jared</a>
+<div class="badge-grid">
+    <div class="badge-card" onclick="location.href='inventory.html'">
+        <h3>FAST</h3>
+        <p>FREE DELIVERY</p>
+        <small>Within 50 miles of lot!</small>
+    </div>
+    <div class="badge-card" onclick="location.href='order-rto.html'">
+        <h3>LOW</h3>
+        <p>MONTHLY PAYMENTS</p>
+        <small>Own it for less than a storage unit!</small>
+    </div>
+    <div class="badge-card" onclick="location.href='inventory.html'">
+        <h3>ON LOT</h3>
+        <p>REPOS AVAILABLE</p>
+        <small>Save big on pre-owned units!</small>
+    </div>
+</div>
+
+<section class="section-split">
+    <div class="split-image" style="background-image: url('actual_images/hallmark-portable-buildings.png');"></div>
+    <div class="split-content">
+        <h2 style="color: var(--accent);">Built Indiana Tough</h2>
+        <p>Hallmark Portable Buildings aren't just sheds—they're tiny fortresses. From compact garden units to massive garage workshops, we build to exceed every standard.</p>
+        <ul>
+            <li>Pressure treated floors & skids</li>
+            <li>LP SmartSide siding (50-year warranty)</li>
+            <li>Double-lock security doors</li>
+        </ul>
+        <a href="order.html" class="btn btn-accent" style="align-self: flex-start; margin-top: 1rem;">GET A QUOTE IN MINUTES</a>
+    </div>
+</section>
+
+<section class="section-split" id="decks" style="flex-direction: row-reverse;">
+    <div class="split-image" style="background-image: url('actual_images/decks/d3035.jpg');"></div>
+    <div class="split-content bg-dark">
+        <h2 style="color: var(--accent);">TIMBERCRAFT DECKS</h2>
+        <div class="price-splash" style="background: var(--success);">NEW 2026 PRICING UPDATED!</div>
+        <p>Upgrade your outdoor life. Timbercraft decks are hand-crafted, stained to perfection, and built to withstand the elements.</p>
+        <h3 style="margin-bottom: 0;">8'x12' Models starting at:</h3>
+        <p style="font-size: 2rem; font-weight: 900; margin: 0;">$2,795<span style="font-size: 1rem;">.82</span></p>
+        <p>Stained and delivered to your site. Rent-to-own available!</p>
+        <a href="decks.html" class="btn btn-outline" style="align-self: flex-start; margin-top: 1rem;">VIEW FULL PRICE LIST</a>
+    </div>
+</section>
+
+<section class="section-split">
+    <div class="split-image" style="background-image: url('actual_images/american-steel-carport.png');"></div>
+    <div class="split-content">
+        <h2>STEEL WITHOUT LIMITS</h2>
+        <p>American Steel Carports are the gold standard for vehicle and equipment protection. Wind-rated, snow-rated, and built with a 20-year warranty.</p>
+        <a href="https://build.americansteelinc.com/dealer/?dealer=SV006474" target="_blank" class="btn btn-accent" style="align-self: flex-start; margin-top: 1rem;">START 3D CARPORT BUILDER</a>
+    </div>
 </section>
 
 <footer>
-    <p>&copy; 2026 Hallmark Spencer Authorized Dealer. Built by Kestrel Agent.</p>
-    <p style="font-size: 0.8rem; opacity: 0.7;">Authorized Dealer for American Steel Carports, Inc. (Dealer ID: SV006474)</p>
+    <h2>HALLMARK SPENCER</h2>
+    <p>Authorized Dealer Jared Baker | (317) 370-5720</p>
+    <a href="tel:+13173705720" class="contact-pill">TAP TO CALL JARED</a>
+    <p style="margin-top: 2rem; font-size: 0.8rem;">&copy; 2026 Hallmark Spencer. All structures subject to availability. Free delivery within 50 miles.</p>
 </footer>
 
 </body>

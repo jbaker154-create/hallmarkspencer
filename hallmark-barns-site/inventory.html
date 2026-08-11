@@ -3,82 +3,743 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Current Lot Inventory | Hallmark Spencer</title>
+    <title>Available Inventory | Hallmark Spencer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #2c3e50;
-            --accent: #e67e22;
-            --success: #27ae60;
-            --cash: #2980b9;
-            --light: #f4f7f6;
+            --primary: #1e293b;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --repo: #ef4444;
+            --builder: #3b82f6;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-muted: #64748b;
         }
-        body { font-family: 'Segoe UI', sans-serif; line-height: 1.6; margin: 0; background: var(--light); color: #333; }
-        header { background: var(--primary); color: white; padding: 2rem; text-align: center; }
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-        .inventory-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; margin-top: 30px; }
-        .unit-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.1); border: 1px solid #ddd; display: flex; flex-direction: column; transition: transform 0.2s; }
-        .unit-card:hover { transform: translateY(-5px); }
-        .unit-img { width: 100%; height: 220px; object-fit: contain; background: #f8f9fa; border-bottom: 3px solid var(--accent); }
-        .unit-info { padding: 20px; flex-grow: 1; text-align: center; }
-        .unit-style { font-size: 1.4rem; font-weight: bold; color: var(--primary); margin: 0; }
-        .unit-size { color: #666; font-size: 1.1rem; margin: 5px 0; }
-        .unit-serial { font-family: monospace; font-size: 0.85rem; color: #999; margin-bottom: 10px; display: block; }
-        .unit-price { font-size: 2.2rem; font-weight: 900; color: var(--success); margin: 15px 0; }
-        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
-        .buy-btn { flex: 1; text-align: center; color: white; text-decoration: none; padding: 12px 5px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; transition: opacity 0.2s; }
-        .buy-btn.rto { background: var(--accent); }
-        .buy-btn.cash { background: var(--cash); }
-        .buy-btn:hover { opacity: 0.9; }
-        .back-link { display: inline-block; margin-bottom: 20px; color: var(--primary); text-decoration: none; font-weight: bold; }
-        .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; margin-bottom: 10px; }
-        .badge-repo { background: #ff4757; color: white; }
-        .badge-new { background: var(--success); color: white; }
+
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            line-height: 1.5;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+        }
+
+        header h1 { 
+            font-size: 3rem; 
+            margin: 0; 
+            font-weight: 800; 
+            letter-spacing: -0.025em;
+        }
+
+        header p { 
+            font-size: 1.25rem; 
+            opacity: 0.9; 
+            max-width: 600px; 
+            margin: 1rem auto 0;
+        }
+
+        .nav-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--accent); }
+
+        .container {
+            max-width: 1280px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .unit-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .unit-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: var(--accent);
+        }
+
+        .unit-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 240px;
+            background: #f1f5f9;
+        }
+
+        .unit-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .unit-card:hover .unit-img {
+            transform: scale(1.05);
+        }
+
+        .badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .badge-new { background-color: var(--success); }
+        .badge-repo { background-color: var(--repo); }
+        .badge-builder { background-color: var(--builder); }
+
+        .unit-info {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .unit-style {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--primary);
+        }
+
+        .unit-size {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin: 0.25rem 0 1rem;
+        }
+
+        .unit-serial {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: #f1f5f9;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            align-self: flex-start;
+        }
+
+        .unit-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 1.5rem 0;
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: auto;
+        }
+
+        .buy-btn {
+            text-align: center;
+            text-decoration: none;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .buy-btn.rto {
+            background: var(--accent);
+            color: white;
+        }
+
+        .buy-btn.cash {
+            background: var(--primary);
+            color: white;
+        }
+
+        .buy-btn:hover {
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
+
+        @media (max-width: 640px) {
+            header h1 { font-size: 2rem; }
+            .inventory-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
+<div class="nav-bar">
+    <a href="index.html" class="back-link">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        Back to Home
+    </a>
+    <img src="https://hallmarkbarns.com/wp-content/uploads/2023/11/hallmark-logo.png" alt="Logo" height="30">
+</div>
+
 <header>
-    <h1>Current Lot Inventory</h1>
-    <p>Available Today in Spencer, IN — Buy Now or Rent-To-Own</p>
+    <h1>Spencer Lot Inventory</h1>
+    <p>Find your perfect building today. Available for immediate delivery or custom order.</p>
 </header>
 
 <div class="container">
-    <a href="index.html" class="back-link">← Back to Home</a>
-    <div class="inventory-grid" id="inventory"></div>
+    <div class="inventory-grid" id="inventory">
+        <!-- Units injected by JS -->
+    </div>
 </div>
 
 <script>
     const buildings = [
-  { "style": "Mini Barn", "category": "New Inventory", "size": "8 x 12", "price": "$2,752.00", "serial": "MB-812-04152026-0085", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KTEFM2BRS5ZSCKBJ9QCQPN1R.jpg" },
-  { "style": "Lofted Barn", "category": "Repo", "size": "12 x 16", "price": "$4,995.00", "serial": "LB-1216-LB-1216-100224-04-MI", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KTCBR7BFDFDK9XSARY42WHEA.jpg" },
-  { "style": "Cabin", "category": "Repo", "size": "12 x 20", "price": "$6,660.00", "serial": "C-1220-07252025-NRE", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KTA2AADMNP9M8K146FK3FJSY.jpg" },
-  { "style": "Utility Shed", "category": "Repo", "size": "8 x 16", "price": "$3,295.00", "serial": "US-816-06132025-5116", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSTRHRNK6879W2Q78N2ET05Q.jpg" },
-  { "style": "Lofted Garden Shed", "category": "New Inventory", "size": "10 x 16", "price": "$5,509.38", "serial": "LGS-1016-04152026-0029", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSP48SGVGT6PYTQF7XBMA3BJ.jpg" },
-  { "style": "Utility Shed", "category": "New Inventory", "size": "10 x 12", "price": "$3,397.00", "serial": "US-1012-04062026-0040", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSMWZ2TH02JD7ME8G4JHN89R.jpg" },
-  { "style": "Chicken Coop", "category": "New Inventory", "size": "6 x 8", "price": "$2,848.75", "serial": "CC-68-03242026-0047", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSMWWE86F1Q0T396FN2D35DK.jpg" },
-  { "style": "Lofted Cabin", "category": "New Inventory", "size": "12 x 28", "price": "$9,384.75", "serial": "LC-1228-03212026-0023", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KS7WJAM31DKHP4F9C0J0FEVD.jpg" },
-  { "style": "Garage", "category": "New Inventory", "size": "12 x 16", "price": "$6,235.00", "serial": "PG-1216-03272026-0093", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KS0E22XGC6FQX05XP3NRFMVT.jpg" },
-  { "style": "Garage", "category": "New Inventory", "size": "12 x 12", "price": "$5,418.00", "serial": "PG-1212-03272026-0094", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KS0E4SSWFEHRJJ9E6TXDBZQ1.jpg" },
-  { "style": "Mini Barn", "category": "New Inventory", "size": "8 x 8", "price": "$2,193.00", "serial": "MB-88-04152026-0084", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KS0E8EVNNHDQYD5K7D9HBFKD.jpg" },
-  { "style": "Run-in Shelter", "category": "New Inventory", "size": "10 x 12", "price": "$3,397.00", "serial": "RS-1012-01232026-0010", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/02/01KGSPRKADA1AQ33HPEX5C1451.jpg" },
-  { "style": "Utility Shed", "category": "New Inventory", "size": "8 x 8", "price": "$2,881.00", "serial": "US-88-01192026-0059", "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/04/01KNC95J1PZZVMG5P9XV5PAXBM.jpg" }
-    ];
+  {
+    "style": "Lofted Cabin",
+    "category": "Repo",
+    "size": "10 x 16",
+    "price": "$5,295.00",
+    "serial": "LC-1016-08524-581-IC",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/07/01KYJPAZ6JHPMBJXZZF0ZCRVDT.jpg"
+  },
+  {
+    "style": "Standard Dog Kennel",
+    "category": "Repo",
+    "size": "8 x 8",
+    "price": "$2,295.00",
+    "serial": "SDK-88-12112025-0017",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/07/01KYJPD8E088RZ6KEWPEBSDQK1.jpg"
+  },
+  {
+    "style": "Utility Shed",
+    "category": "Repo",
+    "size": "16 x 40",
+    "price": "$12,602.00",
+    "serial": "US-1640-03222025-2219",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/07/01KY80X0BB5WTB2H0T6RW60J0Z.jpg"
+  },
+  {
+    "style": "Mini Barn",
+    "category": "New Inventory",
+    "size": "8 x 10",
+    "price": "$2,629.45",
+    "serial": "MB-810-05012026-0002",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KWACHHGJPE9NC0SY0PBPSTC6.jpg"
+  },
+  {
+    "style": "Mini Barn",
+    "category": "New Inventory",
+    "size": "8 x 12",
+    "price": "$2,819.72",
+    "serial": "MB-812-11202025-0073",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/07/01KY666SDT591AANXM8GXGFT8T.jpg"
+  },
+  {
+    "style": "Lofted Cabin",
+    "category": "New Inventory",
+    "size": "10 x 20",
+    "price": "$7,041.25",
+    "serial": "LC-1020-04152026-0020",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/07/01KY664GDF5YF9BYPHWE083QPC.jpg"
+  },
+  {
+    "style": "Cabin",
+    "category": "New Inventory",
+    "size": "12 x 24",
+    "price": "$9,376.15",
+    "serial": "C-1224-07172026-0062",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/07/01KXRNC63JDHPVDNNJ9YCBSS2P.jpg"
+  },
+  {
+    "style": "Playhouse",
+    "category": "New Inventory",
+    "size": "8 x 12",
+    "price": "$3,461.50",
+    "serial": "P-812-05022026-0001",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/07/01KXKKM0642XSNSF11P0C7GXC0.jpg"
+  },
+  {
+    "style": "Cabin",
+    "category": "New Inventory",
+    "size": "12 x 24",
+    "price": "$9,559.33",
+    "serial": "C-1224-06022026-0028",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/07/01KXKKC6SZM7RBKF0PRDKSVH6E.jpg"
+  },
+  {
+    "style": "Lofted Cabin",
+    "category": "New Inventory",
+    "size": "12 x 24",
+    "price": "$10,226.26",
+    "serial": "LC-1224-06022026-0018",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/07/01KWW8TVP2GGEYQJVKW455YX48.jpg"
+  },
+  {
+    "style": "Lofted Garden Shed",
+    "category": "New Inventory",
+    "size": "12 x 32",
+    "price": "$10,153.38",
+    "serial": "LGS-1232-05042026-0017",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KW9QBQRQBEZQ48B2JG3GYQ0M.jpg"
+  },
+  {
+    "style": "Chicken Coop",
+    "category": "Repo",
+    "size": "10 x 12",
+    "price": "$3,796.00",
+    "serial": "CC-1012-042522-64-I",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KVVVJVBHP14QXSGR2Q1H45WF.jpg"
+  },
+  {
+    "style": "Lofted Barn",
+    "category": "Repo",
+    "size": "12 x 16",
+    "price": "$5,295.00",
+    "serial": "LB-1216-LB-1216-100224-04-MI",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KTCBR7BFDFDK9XSARY42WHEA.jpg"
+  },
+  {
+    "style": "Cabin",
+    "category": "Repo",
+    "size": "12 x 20",
+    "price": "$7,020.00",
+    "serial": "C-1220-07252025-NRE",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KTA2AADMNP9M8K146FK3FJSY.jpg"
+  },
+  {
+    "style": "Lofted Garden Shed",
+    "category": "New Inventory",
+    "size": "10 x 16",
+    "price": "$5,922.18",
+    "serial": "LGS-1016-04152026-0029",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSP48SGVGT6PYTQF7XBMA3BJ.jpg"
+  },
+  {
+    "style": "Utility Shed",
+    "category": "New Inventory",
+    "size": "10 x 12",
+    "price": "$3,651.77",
+    "serial": "US-1012-04062026-0040",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSMWZ2TH02JD7ME8G4JHN89R.jpg"
+  },
+  {
+    "style": "Lofted Cabin",
+    "category": "New Inventory",
+    "size": "12 x 28",
+    "price": "$10,088.88",
+    "serial": "LC-1228-03212026-0023",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KS7WJAM31DKHP4F9C0J0FEVD.jpg"
+  },
+  {
+    "style": "Garage",
+    "category": "New Inventory",
+    "size": "12 x 12",
+    "price": "$5,824.35",
+    "serial": "PG-1212-03272026-0094",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KS0E4SSWFEHRJJ9E6TXDBZQ1.jpg"
+  },
+  {
+    "style": "Mini Barn",
+    "category": "New Inventory",
+    "size": "8 x 8",
+    "price": "$2,357.47",
+    "serial": "MB-88-04152026-0084",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KS0E8EVNNHDQYD5K7D9HBFKD.jpg"
+  },
+  {
+    "style": "Run-in Shelter",
+    "category": "New Inventory",
+    "size": "10 x 12",
+    "price": "$3,651.77",
+    "serial": "RS-1012-01232026-0010",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/02/01KGSPRKADA1AQ33HPEX5C1451.jpg"
+  },
+  {
+    "style": "Utility Shed",
+    "category": "New Inventory",
+    "size": "8 x 8",
+    "price": "$3,097.07",
+    "serial": "US-88-01192026-0059",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/04/01KNC95J1PZZVMG5P9XV5PAXBM.jpg"
+  },
+  {
+    "style": "Deluxe Dog Kennel",
+    "category": "New Inventory",
+    "size": "8 x 12",
+    "price": "$5,506.15",
+    "serial": "DK-0812-012624-016-THS",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/buildings/2026/05/01KR44BSP1MMTJDX4SV24RVGHK.jpg"
+  },
+  {
+    "style": "Playhouse",
+    "category": "New Inventory",
+    "size": "8 x 12",
+    "price": "$3,461.50",
+    "serial": "P-812-02282026-0014",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/04/01KNC9ABEEHT8VE2PXP2PMGE77.jpg"
+  },
+  {
+    "style": "Lofted Barn",
+    "category": "New Inventory",
+    "size": "12 x 16",
+    "price": "$6,379.05",
+    "serial": "LB-1216-072624-579-IC",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/buildings/2025/10/01K77RMMRFQQGJXF16PEMFAGX7.jpg"
+  },
+  {
+    "style": "Garden Shed",
+    "category": "New Inventory",
+    "size": "12 x 16",
+    "price": "$5,714.70",
+    "serial": "gs-1216-32923-028-ic",
+    "status": "Available",
+    "img": "https://dms.hallmarkbarns.com/storage/buildings/2025/10/01K7F4JDYN0396V41EVWVPSZVZ.jpg"
+  },
+  {
+    "style": "Garden Shed",
+    "category": "Sale Pending",
+    "size": "10 x 12",
+    "price": "$3,542.00",
+    "serial": "gs-1012-111023-273-ic",
+    "status": "Allocated",
+    "img": "https://dms.hallmarkbarns.com/storage/buildings/2026/02/01KJ84D9ASE3WKB1K2A5AVT2AJ.jpg"
+  },
+  {
+    "style": "Mini Barn",
+    "category": "Sale Pending",
+    "size": "8 x 12",
+    "price": "$2,623.00",
+    "serial": "MB-812-06302026-0129",
+    "status": "Allocated",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/07/01KY669659VDV3BES514JS8Y0K.jpg"
+  },
+  {
+    "style": "Lofted Cabin",
+    "category": "Sale Pending",
+    "size": "12 x 24",
+    "price": "$7,204.00",
+    "serial": "LC-1224-12032025-0004",
+    "status": "Allocated",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KVV1ZZHSQ4X6XNGYGRYMB6G9.jpg"
+  },
+  {
+    "style": "Mini Barn",
+    "category": "Sale Pending",
+    "size": "8 x 12",
+    "price": "$2,752.00",
+    "serial": "MB-812-04152026-0085",
+    "status": "Allocated",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/06/01KTEFM2BRS5ZSCKBJ9QCQPN1R.jpg"
+  },
+  {
+    "style": "Deluxe Dog Kennel",
+    "category": "Sale Pending",
+    "size": "12 x 32",
+    "price": "$4,595.00",
+    "serial": "DK-1232-063022-860-CIN",
+    "status": "Allocated",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/07/01KYATZN0FXYKYDAMB7TWKATHM.jpg"
+  },
+  {
+    "style": "Garage",
+    "category": "Sale Pending",
+    "size": "12 x 16",
+    "price": "$6,235.00",
+    "serial": "PG-1216-03272026-0093",
+    "status": "Allocated",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KS0E22XGC6FQX05XP3NRFMVT.jpg"
+  },
+  {
+    "style": "Utility Shed",
+    "category": "Sale Pending",
+    "size": "8 x 16",
+    "price": "$3,064.49",
+    "serial": "US-816-06132025-5116",
+    "status": "Allocated",
+    "img": "https://dms.hallmarkbarns.com/storage/dealer/2026/05/01KSTRHRNK6879W2Q78N2ET05Q.jpg"
+  },
+  {
+    "style": "Garden Shed",
+    "category": "Sale Pending",
+    "size": "12 x 16",
+    "price": "$5,219.00",
+    "serial": "gs-1216-32823-023-ic",
+    "status": "Allocated",
+    "img": "https://dms.hallmarkbarns.com/storage/buildings/2025/10/01K77R86NNXQ19Y6GK2D4HAKB1.jpg"
+  },
+  {
+    "style": "Lofted Garden Shed",
+    "category": "Sale Pending",
+    "size": "12 x 24",
+    "price": "$7,578.75",
+    "serial": "LGS-1224-02282026-0034",
+    "status": "Allocated",
+    "img": "https://dms.hallmarkbarns.com/images/builder/lofted-garden-shed/lofted-garden-shed-main-photo-100px.png"
+  },
+  {
+    "style": "Mini Barn",
+    "category": "Available at Builder",
+    "size": "10 x 12",
+    "price": "$3,160.00",
+    "serial": "MB-1012-06252026-0113",
+    "status": "Available at Builder",
+    "img": "https://dms.hallmarkbarns.com/storage/buildings/2026/06/01KW05S7TGXBN4FB4EA5T7SH4N.jpg"
+  },
+  {
+    "style": "Cabin",
+    "category": "Available at Builder",
+    "size": "10 x 16",
+    "price": "$5,010.00",
+    "serial": "C-1016-05022026-0008",
+    "status": "Available at Builder",
+    "img": "https://dms.hallmarkbarns.com/images/builder/cabin/cabin-main-photo-100px.png"
+  },
+  {
+    "style": "Mini Barn",
+    "category": "Available at Builder",
+    "size": "8 x 10",
+    "price": "$2,275.00",
+    "serial": "MB-810-05012026-0004",
+    "status": "Building",
+    "img": "https://dms.hallmarkbarns.com/images/builder/mini-barn/mini-barn-main-photo-100px.png"
+  },
+  {
+    "style": "Utility Shed",
+    "category": "Available at Builder",
+    "size": "8 x 12",
+    "price": "$2,990.00",
+    "serial": "US-812-04112026-0061",
+    "status": "Building",
+    "img": "https://dms.hallmarkbarns.com/images/builder/utility-shed/utility-shed-main-photo-100px.png"
+  },
+  {
+    "style": "Mini Barn",
+    "category": "Available at Builder",
+    "size": "12 x 12",
+    "price": "$3,820.00",
+    "serial": "MB-1212-04112026-0059",
+    "status": "Building",
+    "img": "https://dms.hallmarkbarns.com/images/builder/mini-barn/mini-barn-main-photo-100px.png"
+  },
+  {
+    "style": "Studio Shed",
+    "category": "Available at Builder",
+    "size": "12 x 20",
+    "price": "$6,470.00",
+    "serial": "SS-1220-03042026-0011",
+    "status": "Building",
+    "img": "https://dms.hallmarkbarns.com/images/builder/studio-shed/studio-shed-main-photo-100px.png"
+  },
+  {
+    "style": "Lofted Cabin",
+    "category": "Available at Builder",
+    "size": "10 x 16",
+    "price": "$5,155.00",
+    "serial": "LC-1016-02282026-0032",
+    "status": "Building",
+    "img": "https://dms.hallmarkbarns.com/images/builder/lofted-cabin/lofted-cabin-main-photo-100px.png"
+  },
+  {
+    "style": "Mini Barn Chicken Coop",
+    "category": "Available at Builder",
+    "size": "10 x 16",
+    "price": "$5,295.00",
+    "serial": "MBCC-1016-02282026-0030",
+    "status": "Building",
+    "img": "https://dms.hallmarkbarns.com/images/builder/mini-barn-coop/mini-barn-coop-main-photo-100px.png"
+  },
+  {
+    "style": "Lofted Garden Shed",
+    "category": "Available at Builder",
+    "size": "8 x 12",
+    "price": "$3,475.00",
+    "serial": "LGS-812-02202026-0023",
+    "status": "Building",
+    "img": "https://dms.hallmarkbarns.com/images/builder/lofted-garden-shed/lofted-garden-shed-main-photo-100px.png"
+  },
+  {
+    "style": "Greenhouse",
+    "category": "Available at Builder",
+    "size": "10 x 12",
+    "price": "$6,370.00",
+    "serial": "G-1012-02202026-0024",
+    "status": "Building",
+    "img": "https://dms.hallmarkbarns.com/images/builder/greenhouse/greenhouse-main-photo-100px.png"
+  },
+  {
+    "style": "Mini Barn Chicken Coop",
+    "category": "Available at Builder",
+    "size": "8 x 16",
+    "price": "$4,620.00",
+    "serial": "MBCC-816-02162026-0010",
+    "status": "Building",
+    "img": "https://dms.hallmarkbarns.com/images/builder/mini-barn-coop/mini-barn-coop-main-photo-100px.png"
+  },
+  {
+    "style": "Utility Shed",
+    "category": "Available at Builder",
+    "size": "14 x 32",
+    "price": "$10,005.00",
+    "serial": "US-1432-06032026-0008",
+    "status": "Building",
+    "img": "https://dms.hallmarkbarns.com/images/builder/utility-shed/utility-shed-main-photo-100px.png"
+  },
+  {
+    "style": "Mini Barn Chicken Coop",
+    "category": "Available at Builder",
+    "size": "8 x 12",
+    "price": "$3,760.00",
+    "serial": "MBCC-812-04092026-0031",
+    "status": "Pending Builder",
+    "img": "https://dms.hallmarkbarns.com/images/builder/mini-barn-coop/mini-barn-coop-main-photo-100px.png"
+  },
+  {
+    "style": "Utility Shed",
+    "category": "Available at Builder",
+    "size": "12 x 32",
+    "price": "$8,905.00",
+    "serial": "US-1232-02282026-0105",
+    "status": "Building",
+    "img": "https://dms.hallmarkbarns.com/images/builder/utility-shed/utility-shed-main-photo-100px.png"
+  },
+  {
+    "style": "Lofted Garage",
+    "category": "Available at Builder",
+    "size": "12 x 16",
+    "price": "$6,060.00",
+    "serial": "LG-1216-03302026-0015",
+    "status": "Pending Builder",
+    "img": "https://dms.hallmarkbarns.com/images/builder/garage/garage-main-photo-100px.png"
+  },
+  {
+    "style": "Chicken Coop",
+    "category": "Available at Builder",
+    "size": "8 x 16",
+    "price": "$4,620.00",
+    "serial": "CC-816-03232026-0044",
+    "status": "Pending Builder",
+    "img": "https://dms.hallmarkbarns.com/images/builder/chicken-coop/chicken-coop-main-photo-100px.png"
+  }
+];
 
     const grid = document.getElementById('inventory');
     buildings.forEach(b => {
+        const isRepo = b.category.toLowerCase().includes('repo');
+        const isPending = b.category.toLowerCase().includes('pending');
+        const isBuilder = b.category.toLowerCase().includes('builder');
+        
+        let badgeClass = 'badge-new';
+        let badgeText = b.category.toUpperCase();
+        
+        if (isRepo) {
+            badgeClass = 'badge-repo';
+        } else if (isPending) {
+            badgeClass = 'badge-repo'; // Use red for pending
+            badgeText = 'SALE PENDING';
+        } else if (isBuilder) {
+            badgeClass = 'badge-builder';
+            badgeText = 'COMING SOON';
+        }
+
         const card = document.createElement('div');
         card.className = 'unit-card';
+        if (isPending) card.style.opacity = '0.7';
+
         card.innerHTML = `
-            <img src="${b.img}" class="unit-img" onerror="this.src='https://hallmarkbarns.com/wp-content/uploads/2023/11/hallmark-barns-utility-shed-scaled.jpg'">
+            <div class="unit-img-wrapper">
+                <img src="${b.img}" class="unit-img" onerror="this.src='https://hallmarkbarns.com/wp-content/uploads/2023/11/hallmark-barns-utility-shed-scaled.jpg'">
+                <span class="badge ${badgeClass}">${badgeText}</span>
+            </div>
             <div class="unit-info">
-                <span class="badge ${b.category.toLowerCase().includes('repo') ? 'badge-repo' : 'badge-new'}">${b.category.toUpperCase()}</span>
                 <p class="unit-style">${b.style}</p>
                 <p class="unit-size">${b.size}</p>
                 <span class="unit-serial">SN: ${b.serial}</span>
                 <div class="unit-price">${b.price}</div>
+                ${isRepo ? '<p style="font-size: 0.8rem; color: var(--text-muted); margin-top: -0.5rem; font-weight: 600;">Includes professional delivery & setup</p>' : ''}
                 <div class="btn-group">
-                    <a href="order-rto.html?serial=${b.serial}&style=${encodeURIComponent(b.style)}&size=${encodeURIComponent(b.size)}" class="buy-btn rto">START RTO</a>
-                    <a href="order.html?serial=${b.serial}&style=${encodeURIComponent(b.style)}&size=${encodeURIComponent(b.size)}" class="buy-btn cash">BUY CASH</a>
+                    ${isPending ? 
+                        `<div style="grid-column: span 2; text-align: center; font-weight: 800; color: var(--repo); padding: 0.75rem;">SOLD / PENDING</div>` :
+                        `<a href="order-rto.html?serial=${b.serial}&style=${encodeURIComponent(b.style)}&size=${encodeURIComponent(b.size)}" class="buy-btn rto">START RTO</a>
+                         <a href="order.html?serial=${b.serial}&style=${encodeURIComponent(b.style)}&size=${encodeURIComponent(b.size)}" class="buy-btn cash">BUY CASH</a>`
+                    }
                 </div>
             </div>
         `;
