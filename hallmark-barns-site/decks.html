@@ -1,75 +1,706 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Design Your Deck | Hallmark Spencer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Timbercraft Decks Gallery & Builder | Hallmark Spencer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e293b;
-            --accent: #f59e0b;
-            --bg: #f8fafc;
-            --text: #1e293b;
+            --primary: #1a1a1a;
+            --secondary: #2c3e50;
+            --accent: #f39c12;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --light: #f4f4f4;
+            --white: #ffffff;
+            --gray-dark: #333333;
+            --gray-light: #e5e7eb;
         }
 
-        body, html {
+        body {
+            font-family: 'Open Sans', sans-serif;
             margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
-            overflow: hidden;
+            background: var(--light);
+            color: var(--primary);
+            overflow-x: hidden;
         }
 
-        .nav-bar {
-            height: 60px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid #e2e8f0;
+        h1, h2, h3 { font-family: 'Montserrat', sans-serif; text-transform: uppercase; }
+
+        /* Navigation */
+        nav {
+            background: rgba(0,0,0,0.9);
+            padding: 1rem 5%;
+            position: fixed;
+            width: 90%;
+            top: 0;
+            z-index: 1000;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 2rem;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .back-link {
+        .logo-text { color: var(--accent); font-weight: 900; font-size: 1.5rem; text-decoration: none; }
+
+        nav ul { list-style: none; display: flex; gap: 2rem; margin: 0; padding: 0; }
+        nav a { color: var(--white); text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: color 0.3s; }
+        nav a:hover { color: var(--accent); }
+
+        /* Hero Header */
+        .hero {
+            padding-top: 120px;
+            padding-bottom: 60px;
+            background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.85)), url('actual_images/decks/d3035.jpg') no-repeat center center/cover;
+            color: var(--white);
+            text-align: center;
+        }
+
+        .hero h1 { font-size: 3rem; margin: 0; font-weight: 900; letter-spacing: -1px; }
+        .hero p { font-size: 1.25rem; max-width: 800px; margin: 1rem auto 2rem; color: #ccc; }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 50px;
             text-decoration: none;
-            color: var(--text);
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 12px 24px rgba(0,0,0,0.3); }
+
+        .btn-accent { background: var(--accent); color: var(--white); }
+        .btn-success { background: var(--success); color: var(--white); }
+        .btn-outline { border: 2px solid var(--white); color: var(--white); background: transparent; }
+        .btn-outline:hover { background: var(--white); color: var(--primary); }
+
+        /* Gallery Container */
+        .gallery-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 5%;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--accent);
+            margin: 0.75rem auto 0;
+        }
+
+        .section-desc {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        /* Responsive Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+        }
+
+        .card-img-container {
+            position: relative;
+            height: 240px;
+            overflow: hidden;
+            background: #e5e7eb;
+        }
+
+        .card-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .card-img {
+            transform: scale(1.08);
+        }
+
+        .card-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent);
+            color: var(--white);
+            padding: 0.4rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 50px;
+            text-transform: uppercase;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .card h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            color: var(--secondary);
+        }
+
+        .card p {
+            margin: 0;
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gallery-btn {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .gallery-btn:hover {
+            background: var(--accent);
+            color: var(--white);
+        }
+
+        /* 3D Builder Section */
+        .builder-section {
+            background: var(--secondary);
+            color: var(--white);
+            padding: 5rem 5%;
+            text-align: center;
+            border-top: 5px solid var(--accent);
+        }
+
+        .builder-card-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .builder-card-container h2 {
+            font-size: 2.2rem;
+            color: var(--accent);
+            margin-top: 0;
+        }
+
+        .builder-placeholder {
+            max-width: 800px;
+            margin: 2rem auto 0;
+            background: #1a1a1a;
+            border-radius: 12px;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 2px dashed rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .builder-placeholder-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: url('actual_images/decks/d3036.jpg') no-repeat center center/cover;
+            opacity: 0.25;
+            filter: blur(2px);
+        }
+
+        .builder-placeholder-content {
+            position: relative;
+            z-index: 2;
+            padding: 2rem;
+        }
+
+        iframe.builder-iframe {
+            width: 100%;
+            height: 600px;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            display: none;
+            background: #fff;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 5rem 5%;
+            text-align: center;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .pricing-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--secondary);
+            transition: transform 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .pricing-card.featured {
+            border-top-color: var(--accent);
+            transform: scale(1.05);
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .pricing-card.featured:hover {
+            transform: translateY(-5px) scale(1.05);
+        }
+
+        .featured-tag {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: var(--white);
+            padding: 0.4rem 1.2rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .pricing-card h3 { color: var(--secondary); font-size: 1.5rem; margin-top: 0; }
+        .price-tag { font-size: 2.5rem; font-weight: 900; color: var(--primary); margin: 1.5rem 0; }
+        .price-tag span { font-size: 1rem; font-weight: 600; color: #666; }
+        .pricing-features { list-style: none; padding: 0; margin: 2rem 0; line-height: 2; color: #555; }
+
+        /* Lightbox Modal */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.95);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 85%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .lightbox-img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 8px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+            object-fit: contain;
+        }
+
+        .lightbox-caption {
+            color: var(--white);
+            margin-top: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -40px; right: 0;
+            color: var(--white);
+            font-size: 2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .lightbox-close:hover { color: var(--accent); }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            font-size: 1.8rem;
+            font-weight: 700;
+            width: 50px; height: 50px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
         }
+        .lightbox-nav:hover { background: var(--accent); }
+        .lightbox-prev { left: -70px; }
+        .lightbox-next { right: -70px; }
 
-        .back-link:hover { color: var(--accent); }
+        /* Footer */
+        footer { background: var(--primary); color: #888; padding: 4rem 5%; text-align: center; }
+        .contact-pill { display: inline-block; background: #333; color: var(--accent); padding: 1rem 2rem; border-radius: 50px; font-weight: 700; margin-top: 1rem; text-decoration: none; }
 
-        iframe {
-            width: 100%;
-            height: calc(100% - 60px);
-            margin-top: 60px;
-            border: none;
+        @media (max-width: 900px) {
+            .lightbox-nav { display: none; }
+            .hero h1 { font-size: 2.2rem; }
+            .grid { gap: 1.5rem; }
+            .builder-card-container { padding: 1.5rem; }
         }
     </style>
 </head>
 <body>
 
-<div class="nav-bar">
-    <a href="index.html" class="back-link">
-        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-        Back to Site
-    </a>
-    <div style="font-weight: 800; color: var(--primary);">TIMBERCRAFT DECK BUILDER</div>
-    <img src="https://hallmarkbarns.com/wp-content/uploads/2023/11/hallmark-logo.png" alt="Logo" height="25">
+<nav>
+    <a href="index.html" class="logo-text">HALLMARK SPENCER</a>
+    <ul>
+        <li><a href="index.html">HOME</a></li>
+        <li><a href="decks.html" style="color: var(--accent);">DECKS & CONFIGURATOR</a></li>
+        <li><a href="inventory.html">LOT INVENTORY</a></li>
+        <li><a href="order-rto.html">RENT-TO-OWN</a></li>
+    </ul>
+</nav>
+
+<section class="hero">
+    <div class="price-splash" style="background: var(--accent); color: var(--white); display: inline-block; padding: 0.5rem 1.2rem; font-weight: 900; transform: rotate(-1.5deg); margin-bottom: 1.5rem; font-family: 'Montserrat', sans-serif;">TIMBERCRAFT DECKS & CONFIGURATOR</div>
+    <h1>CRAFTED BY HAND. BUILT TO LAST.</h1>
+    <p>Discover real-world examples of our hand-crafted, stained premium decks. Build yours online or order a custom size built to your exact needs.</p>
+    <a href="#configurator" class="btn btn-accent">🔨 LAUNCH 3D BUILDER</a>
+</section>
+
+<!-- Gallery Section -->
+<section class="gallery-container">
+    <h2 class="section-title">TIMBERCRAFT DECK GALLERY</h2>
+    <p class="section-desc">Take a look at some of the stunning, heavy-duty decks we've built, stained, and delivered. Each deck is constructed with pride in Indiana, stained to seal against the elements, and delivered fully intact to your property.</p>
+    
+    <div class="grid">
+        <!-- New Cedar Deck Card -->
+        <div class="card">
+            <div class="card-img-container">
+                <img src="actual_images/decks/6x10-cedar-deck-1.jpg" alt="6x10 Cedar Deck" class="card-img">
+                <span class="card-badge">JUST BUILT</span>
+            </div>
+            <div class="card-content">
+                <h3>6' x 10' Stained Patio Deck</h3>
+                <p>Features a warm Cedar Stain and 36" high railings, perfect for ground-level patios, small entryways, or cozy garden spaces.</p>
+                <div class="card-footer">
+                    <span style="font-weight: 700; color: var(--success); font-size: 0.9rem;">4 Views Available</span>
+                    <button class="gallery-btn" onclick="openMultiGallery(['actual_images/decks/6x10-cedar-deck-1.jpg', 'actual_images/decks/6x10-cedar-deck-2.jpg', 'actual_images/decks/6x10-cedar-deck-3.jpg', 'actual_images/decks/6x10-cedar-deck-4.jpg'], '6\' x 10\' Cedar Stained Deck')">View Project</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pool Deck Card -->
+        <div class="card">
+            <div class="card-img-container">
+                <img src="actual_images/decks/pool-deck-hero.jpg" alt="Pool-Side Deck" class="card-img">
+                <span class="card-badge">POPULAR</span>
+            </div>
+            <div class="card-content">
+                <h3>Stately Custom Pool Deck</h3>
+                <p>Expertly leveled and structurally integrated with an above-ground pool. Designed for heavy foot traffic, safe sunbathing, and pool-side lounging.</p>
+                <div class="card-footer">
+                    <span style="font-weight: 700; color: #777; font-size: 0.9rem;">1 View</span>
+                    <button class="gallery-btn" onclick="openSingleGallery('actual_images/decks/pool-deck-hero.jpg', 'Stately Custom Pool Deck')">View Project</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Patio Card -->
+        <div class="card">
+            <div class="card-img-container">
+                <img src="actual_images/decks/d3035.jpg" alt="12x24 Premium Deck" class="card-img">
+                <span class="card-badge">PREMIUM</span>
+            </div>
+            <div class="card-content">
+                <h3>12' x 24' Premium Double-Step Deck</h3>
+                <p>A massive backyard centerpiece featuring beautiful natural oil staining, dual stair entryways, and premium code-compliant safety railings.</p>
+                <div class="card-footer">
+                    <span style="font-weight: 700; color: #777; font-size: 0.9rem;">2 Views</span>
+                    <button class="gallery-btn" onclick="openMultiGallery(['actual_images/decks/d3035.jpg', 'actual_images/decks/d3036.jpg'], '12\' x 24\' Premium Double-Step Deck')">View Project</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Access Ramp Card -->
+        <div class="card">
+            <div class="card-img-container">
+                <img src="actual_images/decks/ramp.jpg" alt="Access Ramp" class="card-img">
+                <span class="card-badge">SPECIALTY</span>
+            </div>
+            <div class="card-content">
+                <h3>Heavy-Duty Accessibility Ramp</h3>
+                <p>Engineered for maximum stability and gradual incline. Stained to protect against high moisture and winter treatments. Includes extra-strength dual handrails.</p>
+                <div class="card-footer">
+                    <span style="font-weight: 700; color: #777; font-size: 0.9rem;">1 View</span>
+                    <button class="gallery-btn" onclick="openSingleGallery('actual_images/decks/ramp.jpg', 'Heavy-Duty Accessibility Ramp')">View Project</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shed Porch Card -->
+        <div class="card">
+            <div class="card-img-container">
+                <img src="actual_images/decks/porch.jpg" alt="Shed Porch Entry" class="card-img">
+                <span class="card-badge">BEST VALUE</span>
+            </div>
+            <div class="card-content">
+                <h3>Shed Entry Porch Deck</h3>
+                <p>A convenient and sturdy entryway porch, custom height-matched to align perfectly with any portable building or backyard structure.</p>
+                <div class="card-footer">
+                    <span style="font-weight: 700; color: #777; font-size: 0.9rem;">2 Views</span>
+                    <button class="gallery-btn" onclick="openMultiGallery(['actual_images/decks/porch.jpg', 'actual_images/decks/d3010.jpg'], 'Shed Entry Porch Deck')">View Project</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Backyard Deck Card -->
+        <div class="card">
+            <div class="card-img-container">
+                <img src="actual_images/decks/d13484.jpg" alt="Backyard Deck" class="card-img">
+                <span class="card-badge">CLASSIC</span>
+            </div>
+            <div class="card-content">
+                <h3>Classic Open Patio Deck</h3>
+                <p>Clean, open-concept platform deck designed to maximize backyard seating. Stained in a beautiful high-end dark pecan shade for timeless appeal.</p>
+                <div class="card-footer">
+                    <span style="font-weight: 700; color: #777; font-size: 0.9rem;">2 Views</span>
+                    <button class="gallery-btn" onclick="openMultiGallery(['actual_images/decks/d13484.jpg', 'actual_images/decks/d13479.jpg'], 'Classic Open Patio Deck')">View Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 3D Configurator Section -->
+<section id="configurator" class="builder-section">
+    <div class="builder-card-container">
+        <h2>INTERACTIVE 3D DECK CONFIGURATOR</h2>
+        <p style="font-size: 1.15rem; max-width: 800px; margin: 0 auto 2rem; color: #ddd; line-height: 1.6;">
+            Design your custom deck in real-time! Use our digital architect to select your exact dimensions, wood stains, railing styles, stair configurations, and get an instant quote on-screen!
+        </p>
+        
+        <div id="builder-loader" class="builder-placeholder">
+            <div class="builder-placeholder-bg"></div>
+            <div class="builder-placeholder-content">
+                <svg width="60" height="60" fill="none" stroke="var(--accent)" viewBox="0 0 24 24" style="margin-bottom: 1rem;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+                <h3 style="color: var(--white); margin: 0 0 0.5rem 0; font-size: 1.5rem;">Interactive 3D Configurator</h3>
+                <p style="color: #bbb; max-width: 500px; margin: 0 auto 1.5rem; font-size: 0.95rem;">To optimize your page loading speed, the 3D configurator is ready to load on demand. Click below to launch.</p>
+                <button class="btn btn-accent" onclick="loadBuilderIframe()">🔨 LAUNCH 3D CONFIGURATOR</button>
+            </div>
+        </div>
+        
+        <iframe id="builder-iframe" class="builder-iframe" src=""></iframe>
+    </div>
+</section>
+
+<!-- Pricing Grid Section -->
+<section class="pricing-section">
+    <h2 class="section-title">2026 PRICING & FINANCING</h2>
+    <p class="section-desc">Fully hand-crafted, stained, and delivered straight to your yard. We offer both direct purchase and flexible Rent-To-Own (RTO) programs with no credit check required!</p>
+    
+    <div class="pricing-grid">
+        <div class="pricing-card">
+            <h3>8' x 12' Timbercraft Deck</h3>
+            <div class="price-tag">$2,795<span>.82</span></div>
+            <ul class="pricing-features">
+                <li>Stained with high-end preservative</li>
+                <li>Premium pressure-treated lumber</li>
+                <li>Standard dual safety handrails</li>
+                <li>Fully completed, delivered intact</li>
+            </ul>
+            <a href="order.html" class="btn btn-success" style="width: 80%; font-size: 0.85rem;">GET INTACT QUOTE</a>
+        </div>
+        
+        <div class="pricing-card featured">
+            <span class="featured-tag">BEST VALUE</span>
+            <h3>10' x 16' Timbercraft Deck</h3>
+            <div class="price-tag">$3,995<span>.00</span></div>
+            <ul class="pricing-features">
+                <li>All-in luxury patio layout</li>
+                <li>Double structural reinforcement</li>
+                <li>Stained in Cedar or Natural Pecan</li>
+                <li>Safety steps included</li>
+            </ul>
+            <a href="order.html" class="btn btn-accent" style="width: 80%; font-size: 0.85rem;">GET INTACT QUOTE</a>
+        </div>
+        
+        <div class="pricing-card">
+            <h3>Custom Sizing</h3>
+            <div class="price-tag" style="font-size: 1.8rem; margin: 2rem 0; line-height: 1.2;">BUILD TO SUIT</div>
+            <ul class="pricing-features">
+                <li>Your custom width and length</li>
+                <li>Select railing styling</li>
+                <li>Multi-level or entry setups</li>
+                <li>Built directly to local codes</li>
+            </ul>
+            <a href="#configurator" class="btn btn-success" style="width: 80%; font-size: 0.85rem;" onclick="loadBuilderIframe()">DESIGN NOW</a>
+        </div>
+    </div>
+</section>
+
+<!-- Lightbox Markup -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+    <div class="lightbox-content" onclick="event.stopPropagation()">
+        <span class="lightbox-close" onclick="closeLightbox(event)">&times;</span>
+        <div class="lightbox-nav lightbox-prev" onclick="navigateLightbox(-1)">&#10094;</div>
+        <img id="lightbox-img" class="lightbox-img" src="" alt="Enlarged view">
+        <div id="lightbox-caption" class="lightbox-caption"></div>
+        <div class="lightbox-nav lightbox-next" onclick="navigateLightbox(1)">&#10095;</div>
+    </div>
 </div>
 
-<iframe src="deck-builder-app.html"></iframe>
+<footer>
+    <h2>HALLMARK SPENCER</h2>
+    <p>Authorized Dealer Jared Baker | (317) 370-5720</p>
+    <a href="tel:+13173705720" class="contact-pill">TAP TO CALL JARED</a>
+    <p style="margin-top: 2rem; font-size: 0.8rem;">&copy; 2026 Hallmark Spencer. All structures subject to availability. Free delivery within 50 miles.</p>
+</footer>
+
+<script>
+    // Configurator loading
+    function loadBuilderIframe() {
+        const placeholder = document.getElementById('builder-loader');
+        const iframe = document.getElementById('builder-iframe');
+        placeholder.style.display = 'none';
+        iframe.src = 'deck-builder-app.html';
+        iframe.style.display = 'block';
+        iframe.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Lightbox Gallery state
+    let activeImages = [];
+    let activeIndex = 0;
+    let activeTitle = "";
+
+    function openSingleGallery(imgSrc, title) {
+        activeImages = [imgSrc];
+        activeIndex = 0;
+        activeTitle = title;
+        showLightbox();
+    }
+
+    function openMultiGallery(imgArray, title) {
+        activeImages = imgArray;
+        activeIndex = 0;
+        activeTitle = title;
+        showLightbox();
+    }
+
+    function showLightbox() {
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+        const prevBtn = document.querySelector('.lightbox-prev');
+        const nextBtn = document.querySelector('.lightbox-next');
+
+        lightboxImg.src = activeImages[activeIndex];
+        
+        // Append view index if multiple
+        if (activeImages.length > 1) {
+            lightboxCaption.innerText = `${activeTitle} (View ${activeIndex + 1} of ${activeImages.length})`;
+            prevBtn.style.display = 'flex';
+            nextBtn.style.display = 'flex';
+        } else {
+            lightboxCaption.innerText = activeTitle;
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+        }
+
+        lightbox.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Lock background scrolling
+    }
+
+    function closeLightbox(e) {
+        document.getElementById('lightbox').style.display = 'none';
+        document.body.style.overflow = 'auto'; // Unlock scrolling
+    }
+
+    function navigateLightbox(direction) {
+        activeIndex = (activeIndex + direction + activeImages.length) % activeImages.length;
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxCaption = document.getElementById('lightbox-caption');
+        
+        lightboxImg.src = activeImages[activeIndex];
+        lightboxCaption.innerText = `${activeTitle} (View ${activeIndex + 1} of ${activeImages.length})`;
+    }
+
+    // Keyboard navigation for lightbox
+    document.addEventListener('keydown', function(e) {
+        const lightbox = document.getElementById('lightbox');
+        if (lightbox.style.display === 'flex') {
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft' && activeImages.length > 1) navigateLightbox(-1);
+            if (e.key === 'ArrowRight' && activeImages.length > 1) navigateLightbox(1);
+        }
+    });
+</script>
 
 </body>
 </html>

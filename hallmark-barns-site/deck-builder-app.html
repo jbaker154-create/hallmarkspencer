@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Timbercraft Master Deck Builder V16</title>
+    <style>
+        /* UI Styles */
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e0e5ec; }
+        
+        #ui-container { 
+            position: absolute; top: 15px; left: 15px; z-index: 10; 
+            background: rgba(255, 255, 255, 0.95); padding: 15px; 
+            border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.15); 
+            width: 360px; max-height: 94vh; overflow-y: auto; 
+        }
+        
+        /* Custom Scrollbar for UI */
+        #ui-container::-webkit-scrollbar { width: 6px; }
+        #ui-container::-webkit-scrollbar-track { background: transparent; }
+        #ui-container::-webkit-scrollbar-thumb { background-color: #bdc3c7; border-radius: 10px; }
+        
+        h2 { margin: 0 0 10px 0; font-size: 20px; color: #2c3e50; border-bottom: 3px solid #27ae60; padding-bottom: 8px; text-align: center;}
+        
+        /* Collapsible Sections */
+        .section-header {
+            font-size: 14px; font-weight: bold; color: #fff; background: #2980b9; 
+            padding: 10px; margin-top: 10px; border-radius: 6px; cursor: pointer; 
+            display: flex; justify-content: space-between; align-items: center;
+            transition: background 0.2s;
+        }
+        .section-header:hover { background: #2471a3; }
+        .section-content { padding: 10px 5px; display: block; border-left: 2px solid #2980b9; border-right: 2px solid #2980b9; border-bottom: 2px solid #2980b9; border-radius: 0 0 6px 6px; margin-bottom: 5px; background: #fafafa;}
+        
+        .control-group { margin-bottom: 10px; }
+        label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 12px; color: #34495e; }
+        select, input[type=text], input[type=range], input[type=number] { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 13px; box-sizing: border-box; }
+        .value-display { font-size: 11px; color: #e67e22; font-weight: bold; text-align: right; display: block; margin-top: -3px;}
+        
+        .checkbox-container { display: flex; align-items: center; font-size: 12px; font-weight: bold; color: #34495e; cursor: pointer; margin-bottom: 6px; padding: 6px; background: #fff; border-radius: 4px; border: 1px solid #ddd; }
+        .checkbox-container:hover { background: #f1f2f6; }
+        .checkbox-container input { margin-right: 8px; cursor: pointer; }
+        
+        .sub-panel { margin-left: 15px; border-left: 2px dashed #bdc3c7; padding-left: 10px; margin-bottom: 10px; display: none; }
+
+        .pricing-panel { margin-top: 15px; background: #2c3e50; padding: 15px; border-radius: 8px; color: white; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }
+        .price-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
+        .price-total { font-size: 18px; font-weight: bold; color: #2ecc71; border-bottom: 1px solid #4a6278; padding-bottom: 8px; margin-bottom: 10px; }
+        .price-value { font-weight: bold; color: #f1c40f;}
+        
+        .print-btn { background-color: #e67e22; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 6px; margin-top: 15px; cursor: pointer; font-size: 15px; transition: background 0.2s; }
+        .print-btn:hover { background-color: #d35400; }
+        .save-btn { background-color: #3498db; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; border-radius: 6px; margin-top: 10px; cursor: pointer; font-size: 15px; transition: background 0.2s; }
+        .save-btn:hover { background-color: #2980b9; }
+        .instructions { margin-top: 15px; font-size: 11px; color: #7f8c8d; text-align: center; }
+
+        /* Print Styles */
+        #printArea { display: none; }
+        @media print {
+            body { background: white; overflow: visible; }
+            #ui-container, canvas { display: none !important; }
+            #printArea { display: block !important; padding: 20px; font-family: sans-serif; color: #333; }
+            .print-header { border-bottom: 3px solid #27ae60; padding-bottom: 10px; margin-bottom: 20px; }
+            .print-header h1 { margin: 0; font-size: 26px; color: #2c3e50; }
+            .print-customer-box { display: flex; justify-content: space-between; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; font-size: 14px;}
+            .print-image { width: 100%; max-height: 450px; object-fit: contain; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; }
+            .print-specs { font-size: 14px; line-height: 1.6; }
+            .print-specs strong { color: #2980b9; }
+            .print-price-box { margin-top: 20px; background: #f8f9fa; border: 2px solid #2c3e50; padding: 15px; border-radius: 8px; }
+            .print-total { font-size: 22px; font-weight: bold; color: #27ae60; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 10px;}
+            .print-rto { font-size: 16px; font-weight: bold; color: #e67e22; margin: 5px 0;}
+        }
+    </style>
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+    <div id="printArea"></div>
+
+    <div id="ui-container">
+        <h2>Timbercraft Configurator</h2>
+
+        <!-- CUSTOMER INFO SECTION -->
+        <div class="section-header">Customer Information <span class="toggle-icon">▲</span></div>
+        <div class="section-content">
+            <div class="control-group">
+                <input type="text" id="custName" placeholder="Full Name">
+            </div>
+            <div class="control-group">
+                <input type="text" id="custPhone" placeholder="Phone Number">
+            </div>
+            <div class="control-group" style="margin-bottom:0;">
+                <input type="text" id="custAddress" placeholder="Installation Address">
+            </div>
+        </div>
+
+        <!-- CORE DIMENSIONS SECTION -->
+        <div class="section-header">Core Deck Specs <span class="toggle-icon">▲</span></div>
+        <div class="section-content">
+            <div class="control-group">
+                <label>Deck Type</label>
+                <select id="deckTypeSelect">
+                    <option value="regular" selected>Regular Deck</option>
+                    <option value="pool">Pool Deck</option>
+                    <option value="stocktank">Stock Tank Deck</option>
+                    <option value="patio">Patio Deck (Ground Level, No Rails)</option>
+                </select>
+            </div>
+            
+            <div class="sub-panel" id="poolSizeGroup">
+                <label>Above Ground Pool Size</label>
+                <select id="poolSizeSelect">
+                    <option value="15">15' Round Pool</option>
+                    <option value="18">18' Round Pool</option>
+                    <option value="21">21' Round Pool</option>
+                    <option value="24" selected>24' Round Pool</option>
+                    <option value="27">27' Round Pool</option>
+                    <option value="30">30' Round Pool</option>
+                </select>
+            </div>
+            
+            <div class="sub-panel" id="tankSizeGroup">
+                <label>Stock Tank Diameter (ft)</label>
+                <input type="range" id="tankSize" min="8" max="12" step="1" value="8">
+                <span class="value-display" id="tankSizeVal">8 ft</span>
+            </div>
+            
+            <div class="control-group">
+                <label>Deck Size</label>
+                <select id="sizeSelect">
+                    <option value="6x8">6 x 8</option>
+                    <option value="6x12">6 x 12</option>
+                    <option value="8x8">8 x 8</option>
+                    <option value="8x10">8 x 10</option>
+                    <option value="8x12">8 x 12</option>
+                    <option value="8x16">8 x 16</option>
+                    <option value="8x20">8 x 20</option>
+                    <option value="8x24">8 x 24</option>
+                    <option value="8x32">8 x 32</option>
+                    <option value="8x36">8 x 36</option>
+                    <option value="10x12">10 x 12</option>
+                    <option value="10x16" selected>10 x 16</option>
+                    <option value="10x20">10 x 20</option>
+                    <option value="10x24">10 x 24</option>
+                    <option value="10x32">10 x 32</option>
+                    <option value="10x36">10 x 36</option>
+                    <option value="12x12">12 x 12</option>
+                    <option value="12x16">12 x 16</option>
+                    <option value="12x20">12 x 20</option>
+                    <option value="12x24">12 x 24</option>
+                    <option value="12x32">12 x 32</option>
+                    <option value="12x36">12 x 36</option>
+                    <option value="14x14">14 x 14</option>
+                    <option value="14x16">14 x 16</option>
+                    <option value="14x20">14 x 20</option>
+                    <option value="14x24">14 x 24</option>
+                    <option value="14x32">14 x 32</option>
+                    <option value="14x36">14 x 36</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="heightSlider">Deck Height (Inches)</label>
+                <input type="range" id="heightSlider" min="12" max="72" step="1" value="33">
+                <span class="value-display" id="heightVal">33" (Standard)</span>
+            </div>
+            
+            <label class="checkbox-container" style="margin-top: 10px; margin-bottom: 10px;"><input type="checkbox" id="chkNoRails"> Remove Railings</label>
+            
+            <div class="control-group">
+                <label>Roof Style</label>
+                <select id="roofStyleSelect">
+                    <option value="none">No Roof</option>
+                    <option value="slant" selected>Metal Slant Roof</option>
+                    <option value="aframe">A-Frame Roof</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- STYLING SECTION -->
+        <div class="section-header">Visual Styling <span class="toggle-icon">▼</span></div>
+        <div class="section-content" style="display:none;">
+            <div class="control-group">
+                <label>Flood Easy Seal Stain</label>
+                <select id="stainSelect">
+                    <option value="0xB89E78">Natural</option>
+                    <option value="0x9E6E45">Pecan</option>
+                    <option value="0xBC6D39" selected>Natural Cedar</option>
+                    <option value="0x543929">Mission Brown</option>
+                    <option value="0x8A3B26">Redwood</option>
+                    <option value="0x4A3022">Dark Walnut</option>
+                    <option value="0x68251B">Mahogany</option>
+                    <option value="0x452B1D">Burnt Hickory</option>
+                </select>
+            </div>
+            <div class="control-group" style="margin-bottom:0;">
+                <label>CMT Metal Roof Color</label>
+                <select id="roofColorSelect">
+                    <optgroup label="Prime & Thrifty">
+                        <option value="0x1A1B1C">Black</option>
+                        <option value="0x404446" selected>Charcoal</option>
+                        <option value="0xEAEAEA">Brilliant (White)</option>
+                        <option value="0x2C3A33">Hunter</option>
+                        <option value="0x642D26">Rustic</option>
+                        <option value="0xBCB6A4">Light Stone</option>
+                        <option value="0x6D6961">Taupe</option>
+                        <option value="0x383431">Burnished Slate</option>
+                        <option value="0x2A1F1D">Brown</option>
+                    </optgroup>
+                    <optgroup label="Prime Colors">
+                        <option value="0x6A6D6F">Pewter</option>
+                        <option value="0x898B8C">Classic Gray</option>
+                        <option value="0x1C352D">Forest</option>
+                        <option value="0x8B2222">Crimson</option>
+                        <option value="0x422026">Burgundy</option>
+                        <option value="0x1F2B48">Gallery</option>
+                        <option value="0x3D5B71">Ocean</option>
+                        <option value="0x98714B">Tan</option>
+                        <option value="0x9B6236">Copper Metallic</option>
+                    </optgroup>
+                    <optgroup label="Crinkle Options">
+                        <option value="0x1A1A1A">Black Crinkle</option>
+                        <option value="0x3A3A3A">Charcoal Crinkle</option>
+                        <option value="0x787A7D">Gray Crinkle</option>
+                        <option value="0xDFE1E0">White Crinkle</option>
+                        <option value="0x36302B">Burnished Slate Crinkle</option>
+                        <option value="0x3A221C">Brown Crinkle</option>
+                        <option value="0x5E2822">Rustic Crinkle</option>
+                        <option value="0x213229">Hunter Crinkle</option>
+                    </optgroup>
+                    <optgroup label="Other">
+                        <option value="0x9E9E9E">Galvalume</option>
+                    </optgroup>
+                </select>
+            </div>
+        </div>
+
+        <!-- STEPS & RAMPS SECTION -->
+        <div class="section-header">Steps & Ramps <span class="toggle-icon">▼</span></div>
+        <div class="section-content" style="display:none;">
+            <!-- Main Steps -->
+            <div style="background: #eef2f5; padding: 8px; border-radius: 4px; margin-bottom: 10px; border: 1px solid #d5dbdb;">
+                <label>Main Steps</label>
+                <select id="stepSideSelect" style="margin-bottom: 5px;">
+                    <option value="front" selected>Front Edge</option>
+                    <option value="left">Left Edge</option>
+                    <option value="right">Right Edge</option>
+                    <option value="none">No Steps</option>
+                </select>
+                <input type="range" id="stepSlider" min="-6" max="6" step="0.5" value="0">
+                <label style="margin-top: 5px;">Wider Add-on (Ln Ft @ $50/ft)</label>
+                <input type="number" id="numWiderSteps" min="0" max="20" value="0">
+            </div>
+            
+            <!-- Extra Steps -->
+            <div class="control-group" style="display: flex; gap: 5px;">
+                <div style="flex: 1;">
+                    <label>Extra Steps ($250)</label>
+                    <input type="number" id="numExtraSteps" min="0" max="4" value="0">
+                </div>
+                <div style="flex: 1;">
+                    <label>Width (ft)</label>
+                    <input type="number" id="exStepWidth" min="4" max="12" value="4">
+                </div>
+            </div>
+            
+            <div class="sub-panel" id="secondStepControls">
+                <label style="color:#2980b9;">2nd Step Placement</label>
+                <select id="step2SideSelect" style="margin-bottom: 5px;">
+                    <option value="left" selected>Left Edge</option>
+                    <option value="front">Front Edge</option>
+                    <option value="right">Right Edge</option>
+                </select>
+                <input type="range" id="step2Slider" min="-6" max="6" step="0.5" value="0">
+            </div>
+
+            <!-- Ramp -->
+            <label class="checkbox-container" style="border-color:#2ecc71;"><input type="checkbox" id="chkRamp"> Add ADA Ramp ($60/ln ft)</label>
+            <div class="sub-panel" id="rampControls" style="border-left-color: #2ecc71;">
+                <label style="color:#27ae60;">Ramp Placement</label>
+                <select id="rampSideSelect" style="margin-bottom: 5px;">
+                    <option value="right" selected>Right Edge</option>
+                    <option value="left">Left Edge</option>
+                    <option value="front">Front Edge</option>
+                </select>
+                <input type="range" id="rampSlider" min="-6" max="6" step="0.5" value="0">
+                <span class="value-display" id="rampLenVal" style="color:#27ae60;">Length: 0 ft</span>
+            </div>
+            
+            <label class="checkbox-container"><input type="checkbox" id="chkLowRise"> Low Rise Steps ($300)</label>
+        </div>
+
+        <!-- UPGRADES & OPTIONS SECTION -->
+        <div class="section-header">Upgrades & Add-ons <span class="toggle-icon">▼</span></div>
+        <div class="section-content" style="display:none;">
+            <label class="checkbox-container"><input type="checkbox" id="chkSkirting"> Solid Skirting (Dynamic Pricing)</label>
+            <label class="checkbox-container"><input type="checkbox" id="chkScreen"> Screen 3 Sides w/ Door ($55/ln ft)</label>
+            <label class="checkbox-container"><input type="checkbox" id="chkGate"> Aluminum Gate 36" (On 4ft Stairs) ($218)</label>
+
+            <div class="control-group" style="margin-top: 10px;">
+                <label>Custom Add-on Description</label>
+                <input type="text" id="customAddonDesc" placeholder="e.g. Under-deck lighting">
+            </div>
+            <div class="control-group" style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label>Add-on Price ($)</label>
+                    <input type="number" id="customAddonPrice" min="0" value="0" step="1">
+                </div>
+                <div style="flex: 1;">
+                    <label>Sales Tax (%)</label>
+                    <input type="number" id="taxRate" min="0" value="7.0" step="0.1">
+                </div>
+            </div>
+            
+            <div class="control-group" style="margin-bottom:0;">
+                <label>Delivery Zone</label>
+                <select id="deliverySelect">
+                    <option value="0">Within 75 Miles (Free)</option>
+                    <option value="250">76 to 150 Miles (+$250)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="pricing-panel">
+            <div class="price-row">
+                <span>Subtotal:</span><span id="subtotalPrice">$0.00</span>
+            </div>
+            <div class="price-row">
+                <span>Tax:</span><span id="taxAmount">$0.00</span>
+            </div>
+            <div class="price-row price-total" style="margin-top: 5px;">
+                <span>Total:</span><span id="totalPrice">$0.00</span>
+            </div>
+            <div class="price-row">
+                <span>36-Mo RTO:</span><span id="rto36" class="price-value">$0.00 / mo</span>
+            </div>
+            <div class="price-row">
+                <span>48-Mo RTO:</span><span id="rto48" class="price-value">$0.00 / mo</span>
+            </div>
+        </div>
+
+        <button id="printBtn" class="print-btn">🖨️ Print Quote & Save PDF</button>
+        <button id="saveBtn" class="save-btn">💾 Save Interactive Project File</button>
+        <div class="instructions">Left Click + Drag to rotate | Click Gate to open/close</div>
+    </div>
+
+    <script>
+        // --- UI ACCORDION LOGIC ---
+        document.querySelectorAll('.section-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                const icon = header.querySelector('.toggle-icon');
+                if (content.style.display === "none") {
+                    content.style.display = "block";
+                    icon.innerText = "▲";
+                } else {
+                    content.style.display = "none";
+                    icon.innerText = "▼";
+                }
+            });
+        });
+
+        // --- MASTER PRICING DATA ---
+        const baseData = {
+            '6x8':{w:8,d:6,nr:1831,wr:2390}, '6x12':{w:12,d:6,nr:2709,wr:3586},
+            '8x8':{w:8,d:8,nr:2135,wr:2907}, '8x10':{w:10,d:8,nr:2632,wr:3594}, '8x12':{w:12,d:8,nr:2942,wr:4425}, 
+            '8x16':{w:16,d:8,nr:3924,wr:5606}, '8x20':{w:20,d:8,nr:4693,wr:6892}, '8x24':{w:24,d:8,nr:5514,wr:8123}, 
+            '8x32':{w:32,d:8,nr:7063,wr:10312}, '8x36':{w:36,d:8,nr:7657,wr:11650},
+            '10x12':{w:12,d:10,nr:3718,wr:5165}, '10x16':{w:16,d:10,nr:4554,wr:6657}, '10x20':{w:20,d:10,nr:5694,wr:8323}, 
+            '10x24':{w:24,d:10,nr:6638,wr:9840}, '10x32':{w:32,d:10,nr:8635,wr:12852}, '10x36':{w:36,d:10,nr:9681,wr:14672},
+            '12x12':{w:12,d:12,nr:4169,wr:5913}, '12x16':{w:16,d:12,nr:5360,wr:7884}, '12x20':{w:20,d:12,nr:6506,wr:9773}, 
+            '12x24':{w:24,d:12,nr:7443,wr:11244}, '12x32':{w:32,d:12,nr:9693,wr:14318}, '12x36':{w:36,d:12,nr:10876,wr:15390},
+            '14x14':{w:14,d:14,nr:5310,wr:7610}, '14x16':{w:16,d:14,nr:6021,wr:8723}, '14x20':{w:20,d:14,nr:7202,wr:10685}, 
+            '14x24':{w:24,d:14,nr:7914,wr:12960}, '14x32':{w:32,d:14,nr:10177,wr:14993}, '14x36':{w:36,d:14,nr:11401,wr:16571}
+        };
+
+        // --- 3D SETUP ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xdce8f2); 
+        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 20, 35);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        document.body.appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true; controls.dampingFactor = 0.05; controls.maxPolarAngle = Math.PI/2 - 0.02; 
+
+        scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
+        dirLight.position.set(10, 30, 15); dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 2048; dirLight.shadow.mapSize.height = 2048;
+        scene.add(dirLight);
+
+        const woodMat = new THREE.MeshStandardMaterial({ color: 0xBC6D39, roughness: 0.9 }); 
+        const postMat = new THREE.MeshStandardMaterial({ color: 0x9a7b54, roughness: 0.9 }); 
+        const roofMat = new THREE.MeshStandardMaterial({ color: 0x404446, roughness: 0.7, metalness: 0.2 }); 
+        const spindleMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5, metalness: 0.8 }); 
+        const gateMetalMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.6, metalness: 0.6 });
+
+        const ground = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), new THREE.MeshStandardMaterial({ color: 0x4a7c59, roughness: 1.0 }));
+        ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+
+        let deckGroup = new THREE.Group();
+        scene.add(deckGroup);
+
+        const ui = {
+            cName: document.getElementById('custName'), cPhone: document.getElementById('custPhone'), cAddr: document.getElementById('custAddress'),
+            deckType: document.getElementById('deckTypeSelect'), poolGrp: document.getElementById('poolSizeGroup'), poolSelect: document.getElementById('poolSizeSelect'),
+            tankGrp: document.getElementById('tankSizeGroup'), tankSize: document.getElementById('tankSize'), tankSizeVal: document.getElementById('tankSizeVal'),
+            noRails: document.getElementById('chkNoRails'),
+            stain: document.getElementById('stainSelect'), roofC: document.getElementById('roofColorSelect'),
+            size: document.getElementById('sizeSelect'), height: document.getElementById('heightSlider'),
+            hVal: document.getElementById('heightVal'), roofStyle: document.getElementById('roofStyleSelect'),
+            side: document.getElementById('stepSideSelect'), pos: document.getElementById('stepSlider'), wStep: document.getElementById('numWiderSteps'),
+            exStep: document.getElementById('numExtraSteps'), exStepW: document.getElementById('exStepWidth'),
+            side2: document.getElementById('step2SideSelect'), pos2: document.getElementById('step2Slider'), step2Grp: document.getElementById('secondStepControls'),
+            ramp: document.getElementById('chkRamp'), rampSide: document.getElementById('rampSideSelect'), rampPos: document.getElementById('rampSlider'),
+            rampGrp: document.getElementById('rampControls'), rampLenVal: document.getElementById('rampLenVal'),
+            skirt: document.getElementById('chkSkirting'), screen: document.getElementById('chkScreen'),
+            gate: document.getElementById('chkGate'), low: document.getElementById('chkLowRise'), 
+            custDesc: document.getElementById('customAddonDesc'), custPrice: document.getElementById('customAddonPrice'), 
+            tax: document.getElementById('taxRate'), del: document.getElementById('deliverySelect')
+        };
+
+        ui.deckType.addEventListener('change', (e) => { 
+            ui.poolGrp.style.display = e.target.value === 'pool' ? 'block' : 'none'; 
+            ui.tankGrp.style.display = e.target.value === 'stocktank' ? 'block' : 'none'; 
+            buildDeck();
+        });
+        ui.tankSize.addEventListener('input', (e) => { ui.tankSizeVal.innerText = e.target.value + ' ft'; });
+        ui.ramp.addEventListener('change', (e) => { ui.rampGrp.style.display = e.target.checked ? 'block' : 'none'; buildDeck(); });
+        ui.screen.addEventListener('change', (e) => {
+            if (e.target.checked && ui.roofStyle.value === 'none') { ui.roofStyle.value = 'slant'; }
+            buildDeck();
+        });
+        ui.roofStyle.addEventListener('change', (e) => {
+            if (e.target.value === 'none' && ui.screen.checked) { ui.screen.checked = false; }
+            buildDeck();
+        });
+
+        const formatC = (n) => new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(n);
+
+        function calcPrice() {
+            const dims = baseData[ui.size.value];
+            const hInches = parseInt(ui.height.value);
+            const hasRoof = ui.roofStyle.value !== 'none';
+            let subtotal = hasRoof ? dims.wr : dims.nr;
+            const sqft = dims.w * dims.d;
+
+            if (ui.roofStyle.value === 'aframe') {
+                if (sqft <= 100) subtotal += 250;
+                else if (sqft <= 144) subtotal += 375;
+                else if (sqft <= 192) subtotal += 500;
+                else subtotal += 700;
+            }
+
+            if (hInches > 33 && ui.deckType.value !== 'patio') {
+                subtotal += (hInches - 33) * ((sqft <= 100) ? 20 : 30);
+            }
+
+            const lnFt = dims.w + (dims.d * 2);
+            if (ui.skirt.checked && ui.deckType.value !== 'patio') {
+                let skirtRate = 19;
+                if (hInches > 52) skirtRate = 30;
+                else if (hInches >= 31) skirtRate = 25;
+                subtotal += lnFt * skirtRate;
+            }
+            
+            if (ui.screen.checked) subtotal += lnFt * 55;
+            const rampLength = hInches * 0.75;
+            ui.rampLenVal.innerText = `Length: ${rampLength.toFixed(1)} ft`;
+            if (ui.ramp.checked) subtotal += rampLength * 60;
+            if (ui.gate.checked) subtotal += 218;
+            if (ui.low.checked) subtotal += 300;
+            if (ui.deckType.value === 'pool') subtotal += 250;
+            
+            const exCount = parseInt(ui.exStep.value) || 0;
+            const exWidth = parseInt(ui.exStepW.value) || 4;
+            subtotal += exCount * 250;
+            if (exWidth > 4) subtotal += exCount * (exWidth - 4) * 50;
+
+            subtotal += parseInt(ui.wStep.value) * 50;
+            subtotal += parseFloat(ui.custPrice.value) || 0;
+            subtotal += parseInt(ui.del.value);
+
+            const taxRate = parseFloat(ui.tax.value) || 0;
+            const taxAmt = subtotal * (taxRate / 100);
+            const total = subtotal + taxAmt;
+
+            document.getElementById('subtotalPrice').innerText = formatC(subtotal);
+            document.getElementById('taxAmount').innerText = formatC(taxAmt) + (taxRate > 0 ? ` (${taxRate}%)` : '');
+            document.getElementById('totalPrice').innerText = formatC(total);
+            document.getElementById('rto36').innerText = formatC(total / 21.6) + " / mo";
+            document.getElementById('rto48').innerText = formatC(total / 24) + " / mo";
+        }
+        
+        function drawBoxBetween(v1, v2, material) {
+            const dist = v1.distanceTo(v2);
+            if (dist < 0.1) return;
+            const geom = new THREE.BoxGeometry(0.2, 0.2, dist);
+            const mesh = new THREE.Mesh(geom, material);
+            mesh.position.copy(v1).lerp(v2, 0.5);
+            mesh.lookAt(v2);
+            mesh.castShadow = true;
+            deckGroup.add(mesh);
+        }
+
+        function drawXBrace(x1, z1, x2, z2, yBottom, yTop) {
+            if(yTop - yBottom < 1) return;
+            drawBoxBetween(new THREE.Vector3(x1, yBottom + 0.3, z1), new THREE.Vector3(x2, yTop - 0.3, z2), postMat);
+            drawBoxBetween(new THREE.Vector3(x1, yTop - 0.3, z1), new THREE.Vector3(x2, yBottom + 0.3, z2), postMat);
+        }
+
+        function buildDeck() {
+            woodMat.color.setHex(ui.stain.value);
+            postMat.color.setHex(ui.stain.value);
+            roofMat.color.setHex(ui.roofC.value);
+
+            scene.remove(deckGroup);
+            deckGroup = new THREE.Group();
+            scene.add(deckGroup);
+
+            const dims = baseData[ui.size.value];
+            const w = dims.w, d = dims.d;
+            
+            const isPatio = (ui.deckType.value === 'patio');
+            const hInches = isPatio ? 6 : parseInt(ui.height.value);
+            const h = hInches/12;
+            ui.hVal.innerText = isPatio ? `6" (Patio Ground Level)` : `${hInches}"` + (hInches > 33 ? ` (+Upcharge)` : ` (Standard)`);
+
+            const isPool = (ui.deckType.value === 'pool');
+            const isStockTank = (ui.deckType.value === 'stocktank');
+            
+            const poolRadius = parseFloat(ui.poolSelect.value) / 2;
+            const poolCenterZ = -d/2 - poolRadius + 1.0;
+            const tankRadius = parseFloat(ui.tankSize.value) / 2;
+
+            // --- Step & Ramp Configurations ---
+            const exCount = parseInt(ui.exStep.value) || 0;
+            ui.step2Grp.style.display = (exCount >= 1) ? 'block' : 'none';
+
+            const mainW = 4 + parseInt(ui.wStep.value); 
+            let mainPos = parseFloat(ui.pos.value);
+            const mainSide = ui.side.value;
+
+            const exWidth = parseInt(ui.exStepW.value) || 4;
+            const step2Side = ui.side2.value;
+            let step2Pos = parseFloat(ui.pos2.value);
+
+            const maxOff1 = mainSide === 'front' ? (w/2)-(mainW/2) : (d/2)-(mainW/2);
+            ui.pos.min = -maxOff1; ui.pos.max = maxOff1;
+            if(mainPos > maxOff1) mainPos = maxOff1; if(mainPos < -maxOff1) mainPos = -maxOff1;
+            ui.pos.value = mainPos;
+
+            const maxOff2 = step2Side === 'front' ? (w/2)-(exWidth/2) : (d/2)-(exWidth/2);
+            ui.pos2.min = -maxOff2; ui.pos2.max = maxOff2;
+            if(step2Pos > maxOff2) step2Pos = maxOff2; if(step2Pos < -maxOff2) step2Pos = -maxOff2;
+            ui.pos2.value = step2Pos;
+
+            let gapCuts = [];
+            if (mainSide !== 'none') {
+                gapCuts.push({ side: mainSide, pos: mainPos, w: mainW, isMain: true });
+            }
+            if (exCount >= 1) gapCuts.push({ side: step2Side, pos: step2Pos, w: exWidth });
+            
+            const altSides = ['front', 'left', 'right'].filter(s => s !== mainSide && s !== step2Side);
+            if (altSides.length === 0) altSides.push('left'); 
+            
+            if (exCount >= 2) gapCuts.push({ side: altSides[0], pos: 0, w: exWidth });
+            if (exCount >= 3) {
+                if (mainSide !== 'none') {
+                    gapCuts.push({ side: mainSide, pos: mainPos > 0 ? mainPos - mainW/2 - exWidth/2 - 1 : mainPos + mainW/2 + exWidth/2 + 1, w: exWidth }); 
+                } else {
+                    gapCuts.push({ side: 'front', pos: 0, w: exWidth });
+                }
+            }
+            if (exCount >= 4) gapCuts.push({ side: altSides[0], pos: (d/2 - exWidth/2 - 0.5), w: exWidth });
+
+            let rampPos = parseFloat(ui.rampPos.value);
+            const rampSide = ui.rampSide.value;
+            if(ui.ramp.checked && !isPatio) {
+                const maxOffRamp = rampSide === 'front' ? (w/2)-(4/2) : (d/2)-(4/2);
+                ui.rampPos.min = -maxOffRamp; ui.rampPos.max = maxOffRamp;
+                if(rampPos > maxOffRamp) rampPos = maxOffRamp; if(rampPos < -maxOffRamp) rampPos = -maxOffRamp;
+                ui.rampPos.value = rampPos;
+                gapCuts.push({ side: rampSide, pos: rampPos, w: 4.2 });
+            }
+
+            // --- Floor ---
+            const shape = new THREE.Shape();
+            shape.moveTo(-w/2, d/2); shape.lineTo(w/2, d/2);  
+            if (isPool) {
+                for(let i=0; i<=30; i++) {
+                    let px = (w/2) - w*(i/30); 
+                    let safePx = Math.max(-poolRadius + 0.1, Math.min(poolRadius - 0.1, px));
+                    let pz = poolCenterZ + Math.sqrt(Math.pow(poolRadius, 2) - Math.pow(safePx, 2));
+                    shape.lineTo(px, Math.max(-d/2, pz));
+                }
+            } else {
+                shape.lineTo(w/2, -d/2); shape.lineTo(-w/2, -d/2);
+            }
+            shape.lineTo(-w/2, d/2); 
+
+            if (isStockTank) {
+                const hole = new THREE.Path();
+                hole.absarc(0, 0, tankRadius, 0, Math.PI * 2, true); 
+                shape.holes.push(hole);
+            }
+
+            const floor = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: 0.5, bevelEnabled: false }), woodMat);
+            floor.rotation.x = Math.PI / 2; floor.position.y = h; floor.castShadow = true; floor.receiveShadow = true;
+            deckGroup.add(floor);
+
+            if (isPool) {
+                const water = new THREE.Mesh(new THREE.CylinderGeometry(poolRadius, poolRadius, 4, 32), new THREE.MeshStandardMaterial({ color: 0x40a0ff, transparent: true, opacity: 0.85, roughness: 0.1 }));
+                water.position.set(0, 2, poolCenterZ); deckGroup.add(water);
+                const poolWall = new THREE.Mesh(new THREE.CylinderGeometry(poolRadius + 0.1, poolRadius + 0.1, 4.05, 32, 1, true), new THREE.MeshStandardMaterial({ color: 0xe8e9ea, roughness: 0.7, side: THREE.DoubleSide }));
+                poolWall.position.set(0, 2.025, poolCenterZ); deckGroup.add(poolWall);
+            }
+            if (isStockTank) {
+                const tankWall = new THREE.Mesh(new THREE.CylinderGeometry(tankRadius - 0.05, tankRadius - 0.05, 2.5, 32, 1, true), new THREE.MeshStandardMaterial({ color: 0x95a5a6, roughness: 0.4, metalness: 0.8, side: THREE.DoubleSide }));
+                tankWall.position.set(0, 1.25, 0); deckGroup.add(tankWall);
+                const tankWater = new THREE.Mesh(new THREE.CylinderGeometry(tankRadius - 0.1, tankRadius - 0.1, 2.3, 32), new THREE.MeshStandardMaterial({ color: 0x3498db, transparent: true, opacity: 0.85, roughness: 0.1 }));
+                tankWater.position.set(0, 1.15, 0); deckGroup.add(tankWater);
+            }
+
+            function getBackZ(px) {
+                if (!isPool || px < -poolRadius || px > poolRadius) return -d/2;
+                return poolCenterZ + Math.sqrt(Math.pow(poolRadius, 2) - Math.pow(px, 2));
+            }
+
+            const railHeight = 3;
+            function cRail(len, isX, px, pz) {
+                if(len <= 0.1 || isPatio || ui.noRails.checked) return;
+                const rGrp = new THREE.Group(), rx=isX?len:0.3, rz=isX?0.3:len;
+                const bR = new THREE.Mesh(new THREE.BoxGeometry(rx,0.15,rz),woodMat); bR.position.y=0.5; rGrp.add(bR);
+                const tR = new THREE.Mesh(new THREE.BoxGeometry(rx,0.15,rz),woodMat); tR.position.y=railHeight; rGrp.add(tR);
+                const cnt = Math.floor(len/0.4); 
+                for(let i=0; i<=cnt; i++){
+                    const bal = new THREE.Mesh(new THREE.BoxGeometry(0.08, railHeight-0.5, 0.08), spindleMat);
+                    bal.position.y= (railHeight/2) + 0.25; 
+                    if(isX) bal.position.x=-len/2+(i*(len/cnt)); else bal.position.z=-len/2+(i*(len/cnt));
+                    bal.castShadow=true; rGrp.add(bal);
+                }
+                rGrp.position.set(px,h+0.25,pz); deckGroup.add(rGrp);
+            }
+
+            function drawGate(gateW, isX, px, pz) {
+                if (ui.noRails.checked) return;
+                const pivot = new THREE.Group();
+                pivot.userData.isGatePivot = true;
+                pivot.userData.targetAngle = 0;
+                
+                if (isX) {
+                    pivot.position.set(px - gateW/2, h + 0.25, pz);
+                } else {
+                    pivot.position.set(px, h + 0.25, pz - gateW/2);
+                }
+
+                const gGrp = new THREE.Group();
+                if (isX) {
+                    gGrp.position.set(gateW/2, 0, 0);
+                } else {
+                    gGrp.position.set(0, 0, gateW/2);
+                }
+
+                const rx=isX?gateW:0.1, rz=isX?0.1:gateW;
+                const bR = new THREE.Mesh(new THREE.BoxGeometry(rx,0.1,rz), gateMetalMat); bR.position.y=0.4; gGrp.add(bR);
+                const tR = new THREE.Mesh(new THREE.BoxGeometry(rx,0.1,rz), gateMetalMat); tR.position.y=railHeight; gGrp.add(tR);
+                const lP = new THREE.Mesh(new THREE.BoxGeometry(0.1, railHeight, 0.1), gateMetalMat); lP.position.y=railHeight/2; 
+                if(isX) lP.position.x=-gateW/2; else lP.position.z=-gateW/2; gGrp.add(lP);
+                const rP = new THREE.Mesh(new THREE.BoxGeometry(0.1, railHeight, 0.1), gateMetalMat); rP.position.y=railHeight/2; 
+                if(isX) rP.position.x=gateW/2; else rP.position.z=gateW/2; gGrp.add(rP);
+                
+                const cnt = Math.floor(gateW/0.4); 
+                for(let i=1; i<cnt; i++){
+                    const bal = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, railHeight-0.4, 8), gateMetalMat);
+                    bal.position.y= (railHeight/2) + 0.2; 
+                    if(isX) bal.position.x=-gateW/2+(i*(gateW/cnt)); else bal.position.z=-gateW/2+(i*(gateW/cnt));
+                    gGrp.add(bal);
+                }
+                
+                gGrp.traverse((child) => {
+                    if (child.isMesh) {
+                        child.userData.isGateMesh = true;
+                        child.userData.pivot = pivot;
+                    }
+                });
+
+                pivot.add(gGrp);
+                deckGroup.add(pivot);
+            }
+
+            function cSkirt(len, isX, px, pz) {
+                if(len <= 0.1 || isPatio) return;
+                const rx=isX?len:0.2, rz=isX?0.2:len;
+                const skirt = new THREE.Mesh(new THREE.BoxGeometry(rx, h, rz), woodMat);
+                skirt.position.set(px, h/2, pz); deckGroup.add(skirt);
+            }
+            
+            let gateRendered = false;
+
+            function buildSideEdge(sideName, length) {
+                let sideGaps = gapCuts.filter(s => s.side === sideName);
+                let gaps = sideGaps.map(s => ({ start: s.pos - s.w/2, end: s.pos + s.w/2, obj: s })).sort((a,b) => a.start - b.start);
+                
+                let current = -length/2;
+                const processSegment = (start, end) => {
+                    let len = end - start; let mid = start + len/2;
+                    if(sideName === 'front') { cRail(len, true, mid, d/2 - 0.15); if(ui.skirt.checked) cSkirt(len, true, mid, d/2); }
+                    if(sideName === 'left') { cRail(len, false, -w/2 + 0.15, mid); if(ui.skirt.checked) cSkirt(len, false, -w/2, mid); }
+                    if(sideName === 'right') { cRail(len, false, w/2 - 0.15, mid); if(ui.skirt.checked) cSkirt(len, false, w/2, mid); }
+                };
+
+                gaps.forEach(gap => {
+                    if (gap.start > current) processSegment(current, gap.start);
+                    
+                    if(ui.gate.checked && !gateRendered && !isPatio && Math.abs(gap.obj.w - 4) < 0.1) {
+                        let mid = gap.start + (gap.obj.w / 2);
+                        if(sideName === 'front') { drawGate(gap.obj.w, true, mid, d/2 - 0.15); }
+                        if(sideName === 'left') { drawGate(gap.obj.w, false, -w/2 + 0.15, mid); }
+                        if(sideName === 'right') { drawGate(gap.obj.w, false, w/2 - 0.15, mid); }
+                        gateRendered = true;
+                    }
+
+                    current = Math.max(current, gap.end);
+                });
+                if (current < length/2) processSegment(current, length/2);
+            }
+
+            buildSideEdge('front', w); buildSideEdge('left', d); buildSideEdge('right', d);
+
+            if (!ui.skirt.checked && !isPatio) {
+                const cPost = (x,z) => { const p = new THREE.Mesh(new THREE.BoxGeometry(0.4,h,0.4), postMat); p.position.set(x,h/2,z); p.castShadow=true; deckGroup.add(p); };
+                
+                const fl = {x: -w/2+0.3, z: d/2-0.3};
+                const fr = {x: w/2-0.3, z: d/2-0.3};
+                const bl = {x: -w/2+0.3, z: Math.max(-d/2 + 0.3, getBackZ(-w/2 + 0.3) + 0.3)};
+                const br = {x: w/2-0.3, z: Math.max(-d/2 + 0.3, getBackZ(w/2 - 0.3) + 0.3)};
+
+                cPost(fl.x, fl.z); cPost(fr.x, fr.z);
+                cPost(bl.x, bl.z); cPost(br.x, br.z);
+                
+                drawXBrace(fl.x, fl.z, bl.x, bl.z, 0, h);
+                drawXBrace(fr.x, fr.z, br.x, br.z, 0, h);
+                if(!isPool) drawXBrace(bl.x, bl.z, br.x, br.z, 0, h);
+
+                if(w>=12){ 
+                    const fm = {x: 0, z: d/2-0.3}; 
+                    const bm = {x: 0, z: Math.max(-d/2 + 0.3, getBackZ(0) + 0.3)};
+                    cPost(fm.x, fm.z); cPost(bm.x, bm.z);
+                    drawXBrace(fl.x, fl.z, fm.x, fm.z, 0, h); drawXBrace(fm.x, fm.z, fr.x, fr.z, 0, h);
+                    if(!isPool) { drawXBrace(bl.x, bl.z, bm.x, bm.z, 0, h); drawXBrace(bm.x, bm.z, br.x, br.z, 0, h); }
+                } else {
+                    drawXBrace(fl.x, fl.z, fr.x, fr.z, 0, h);
+                }
+                
+                if(d>=10){ cPost(-w/2+0.3, 0); cPost(w/2-0.3, 0); }
+            }
+
+            // --- BUILD STAIRS ---
+            if (!isPatio) {
+                const stepRun = 0.9; const numSteps = Math.max(1, Math.ceil(h / 0.625)); const rise = h / numSteps;
+                function createStaircase(sideName, pos, sW) {
+                    if (sideName === 'none') return;
+                    const stepGrp = new THREE.Group();
+                    for(let i=1; i<=numSteps; i++) {
+                        const tread = new THREE.Mesh(new THREE.BoxGeometry(sW, 0.15, stepRun), woodMat);
+                        tread.position.set(0, h - (i*rise), (i*stepRun) - stepRun/2); tread.castShadow = true; stepGrp.add(tread);
+                        const stringer = new THREE.Mesh(new THREE.BoxGeometry(sW-0.2, rise, stepRun), woodMat);
+                        stringer.position.set(0, h - (i*rise) - rise/2, (i*stepRun) - stepRun/2); stepGrp.add(stringer);
+                    }
+                    const createHandrail = (px) => {
+                        if (ui.noRails.checked) return;
+                        const hrGrp = new THREE.Group();
+                        const tPost = new THREE.Mesh(new THREE.BoxGeometry(0.3, railHeight+0.5, 0.3), woodMat); tPost.position.set(px, h + railHeight/2, 0.15); hrGrp.add(tPost);
+                        const bPost = new THREE.Mesh(new THREE.BoxGeometry(0.3, railHeight+0.5, 0.3), woodMat); bPost.position.set(px, railHeight/2, numSteps*stepRun - 0.15); hrGrp.add(bPost);
+                        const sRail = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.15, Math.sqrt(Math.pow(numSteps*stepRun, 2) + Math.pow(h, 2))), woodMat);
+                        sRail.position.set(px, h/2 + railHeight, (numSteps*stepRun)/2); sRail.rotation.x = Math.atan2(h, numSteps*stepRun); hrGrp.add(sRail);
+                        for(let i=1; i<=numSteps; i++) {
+                            const sp1 = new THREE.Mesh(new THREE.BoxGeometry(0.08, railHeight-0.3, 0.08), spindleMat); sp1.position.set(px, h - (i*rise) + railHeight/2, (i*stepRun) - stepRun*0.75); hrGrp.add(sp1);
+                            const sp2 = new THREE.Mesh(new THREE.BoxGeometry(0.08, railHeight-0.3, 0.08), spindleMat); sp2.position.set(px, h - (i*rise) + railHeight/2 - (rise*0.5), (i*stepRun) - stepRun*0.25); hrGrp.add(sp2);
+                        }
+                        stepGrp.add(hrGrp);
+                    };
+                    createHandrail(-sW/2 + 0.15); createHandrail(sW/2 - 0.15);  
+                    if(sideName==='front') { stepGrp.position.set(pos, 0, d/2); } 
+                    else if(sideName==='left') { stepGrp.rotation.y = -Math.PI/2; stepGrp.position.set(-w/2, 0, pos); } 
+                    else { stepGrp.rotation.y = Math.PI/2; stepGrp.position.set(w/2, 0, pos); }
+                    deckGroup.add(stepGrp);
+                }
+                
+                let stairSets = [];
+                if (mainSide !== 'none') stairSets.push({ side: mainSide, pos: mainPos, w: mainW });
+                if (exCount >= 1) stairSets.push({ side: step2Side, pos: step2Pos, w: exWidth });
+                if (exCount >= 2) stairSets.push({ side: altSides[0], pos: 0, w: exWidth });
+                if (exCount >= 3) {
+                    if (mainSide !== 'none') {
+                        stairSets.push({ side: mainSide, pos: mainPos > 0 ? mainPos - mainW/2 - exWidth/2 - 1 : mainPos + mainW/2 + exWidth/2 + 1, w: exWidth });
+                    } else {
+                        stairSets.push({ side: 'front', pos: 0, w: exWidth });
+                    }
+                }
+                if (exCount >= 4) stairSets.push({ side: altSides[0], pos: (d/2 - exWidth/2 - 0.5), w: exWidth });
+                
+                stairSets.forEach(s => createStaircase(s.side, s.pos, s.w));
+
+                // --- BUILD RAMP ---
+                if(ui.ramp.checked) {
+                    const rmpGrp = new THREE.Group();
+                    const rmpRun = hInches * 0.75; 
+                    const rmpWidth = 4;
+                    const rmpAngle = Math.atan2(h, rmpRun);
+                    const rmpHyp = Math.sqrt(h*h + rmpRun*rmpRun);
+                    
+                    const rmpSurf = new THREE.Mesh(new THREE.BoxGeometry(rmpWidth, 0.15, rmpHyp), woodMat);
+                    rmpSurf.position.set(0, h/2, rmpRun/2); rmpSurf.rotation.x = rmpAngle; rmpSurf.castShadow=true; rmpGrp.add(rmpSurf);
+                    
+                    const createRampRail = (px) => {
+                        if (ui.noRails.checked) return;
+                        const rRGrp = new THREE.Group();
+                        const tR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.15, rmpHyp), woodMat); tR.position.set(px, h/2 + railHeight, rmpRun/2); tR.rotation.x = rmpAngle; rRGrp.add(tR);
+                        const bR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.15, rmpHyp), woodMat); bR.position.set(px, h/2 + 0.5, rmpRun/2); bR.rotation.x = rmpAngle; rRGrp.add(bR);
+                        
+                        const tPost = new THREE.Mesh(new THREE.BoxGeometry(0.3, railHeight+0.5, 0.3), woodMat); tPost.position.set(px, h + railHeight/2, 0.15); rRGrp.add(tPost);
+                        const bPost = new THREE.Mesh(new THREE.BoxGeometry(0.3, railHeight+0.5, 0.3), woodMat); bPost.position.set(px, railHeight/2, rmpRun - 0.15); rRGrp.add(bPost);
+                        
+                        const numSpindles = Math.floor(rmpHyp / 0.4);
+                        for(let i=1; i<numSpindles; i++) {
+                            const spZ = (i/numSpindles) * rmpRun;
+                            const sp = new THREE.Mesh(new THREE.BoxGeometry(0.08, railHeight-0.3, 0.08), spindleMat);
+                            sp.position.set(px, (h - (spZ * Math.tan(rmpAngle))) + railHeight/2, spZ); rRGrp.add(sp);
+                        }
+                        rmpGrp.add(rRGrp);
+                    }
+                    createRampRail(-rmpWidth/2 + 0.15); createRampRail(rmpWidth/2 - 0.15);
+                    
+                    if(rampSide==='front') { rmpGrp.position.set(rampPos, 0, d/2); } 
+                    else if(rampSide==='left') { rmpGrp.rotation.y = -Math.PI/2; rmpGrp.position.set(-w/2, 0, rampPos); } 
+                    else { rmpGrp.rotation.y = Math.PI/2; rmpGrp.position.set(w/2, 0, rampPos); }
+                    deckGroup.add(rmpGrp);
+                }
+            }
+
+
+            // --- Roof Options ---
+            const rStyle = ui.roofStyle.value;
+            const fh=8, bh=fh+(d*0.15), avg=(fh+bh)/2;
+
+            if (rStyle === 'slant') {
+                const cRP = (x,z,hgt) => { const p=new THREE.Mesh(new THREE.BoxGeometry(0.4,1,0.4),woodMat); p.scale.y=hgt; p.position.set(x,h+hgt/2,z); p.castShadow=true; deckGroup.add(p); };
+                cRP(-w/2+0.3, d/2-0.3, fh); cRP(w/2-0.3, d/2-0.3, fh); 
+                cRP(-w/2+0.3, Math.max(-d/2 + 0.3, getBackZ(-w/2 + 0.3) + 0.3), bh); cRP(w/2-0.3, Math.max(-d/2 + 0.3, getBackZ(w/2 - 0.3) + 0.3), bh);
+                const r = new THREE.Mesh(new THREE.BoxGeometry(w+2,0.4,d+2), roofMat);
+                r.position.set(0,h+avg+0.2,0); r.rotation.x=Math.atan(0.15); r.castShadow=true; deckGroup.add(r);
+            } 
+            else if (rStyle === 'aframe') {
+                const cRP = (x,z,hgt) => { const p=new THREE.Mesh(new THREE.BoxGeometry(0.4,1,0.4),woodMat); p.scale.y=hgt; p.position.set(x,h+hgt/2,z); p.castShadow=true; deckGroup.add(p); };
+                cRP(-w/2+0.3, d/2-0.3, fh); cRP(w/2-0.3, d/2-0.3, fh); 
+                cRP(-w/2+0.3, Math.max(-d/2 + 0.3, getBackZ(-w/2 + 0.3) + 0.3), fh); cRP(w/2-0.3, Math.max(-d/2 + 0.3, getBackZ(w/2 - 0.3) + 0.3), fh);
+                
+                const rShape = new THREE.Shape(); rShape.moveTo(-w/2 - 1, 0); rShape.lineTo(w/2 + 1, 0); rShape.lineTo(0, 3.5); rShape.lineTo(-w/2 - 1, 0);
+                const aFrame = new THREE.Mesh(new THREE.ExtrudeGeometry(rShape, { depth: d + 2, bevelEnabled: false }), roofMat);
+                aFrame.position.set(0, h + fh, -d/2 - 1); aFrame.castShadow = true; deckGroup.add(aFrame);
+
+                const gableGeo = new THREE.ShapeGeometry(rShape);
+                const frontGable = new THREE.Mesh(gableGeo, woodMat); frontGable.position.set(0, h + fh, d/2); frontGable.castShadow = true; deckGroup.add(frontGable);
+                const backGable = new THREE.Mesh(gableGeo, woodMat); backGable.position.set(0, h + fh, Math.max(-d/2, getBackZ(0))); backGable.castShadow = true; deckGroup.add(backGable);
+            }
+
+            if (ui.screen.checked && rStyle !== 'none') {
+                const screenMat = new THREE.MeshStandardMaterial({ color: 0x111111, transparent: true, opacity: 0.5, side: THREE.DoubleSide });
+                const wireMat = new THREE.MeshBasicMaterial({ color: 0x555555, wireframe: true, transparent: true, opacity: 0.2 });
+                const addScreen = (mesh) => { deckGroup.add(mesh); const wire = mesh.clone(); wire.material = wireMat; deckGroup.add(wire); };
+
+                if (rStyle === 'slant') {
+                    const fScreen = new THREE.Mesh(new THREE.BoxGeometry(w, fh, 0.05), screenMat); fScreen.position.set(0, h + fh/2, d/2); addScreen(fScreen);
+                    const sShape = new THREE.Shape(); sShape.moveTo(d/2, 0); sShape.lineTo(-d/2, 0); sShape.lineTo(-d/2, bh); sShape.lineTo(d/2, fh); sShape.lineTo(d/2, 0);
+                    const sGeom = new THREE.ShapeGeometry(sShape);
+                    const lScreen = new THREE.Mesh(sGeom, screenMat); lScreen.rotation.y = -Math.PI / 2; lScreen.position.set(-w/2, h, 0); addScreen(lScreen);
+                    const rScreen = new THREE.Mesh(sGeom, screenMat); rScreen.rotation.y = -Math.PI / 2; rScreen.position.set(w/2, h, 0); addScreen(rScreen);
+                } else {
+                    const fShape = new THREE.Shape(); fShape.moveTo(-w/2, 0); fShape.lineTo(w/2, 0); fShape.lineTo(w/2, fh); fShape.lineTo(0, fh + 3.5); fShape.lineTo(-w/2, fh);
+                    const fScreen = new THREE.Mesh(new THREE.ShapeGeometry(fShape), screenMat); fScreen.position.set(0, h, d/2); addScreen(fScreen);
+                    const sShape = new THREE.Shape(); sShape.moveTo(d/2, 0); sShape.lineTo(-d/2, 0); sShape.lineTo(-d/2, fh); sShape.lineTo(d/2, fh);
+                    const sGeom = new THREE.ShapeGeometry(sShape);
+                    const lScreen = new THREE.Mesh(sGeom, screenMat); lScreen.rotation.y = -Math.PI / 2; lScreen.position.set(-w/2, h, 0); addScreen(lScreen);
+                    const rScreen = new THREE.Mesh(sGeom, screenMat); rScreen.rotation.y = -Math.PI / 2; rScreen.position.set(w/2, h, 0); addScreen(rScreen);
+                }
+            }
+
+            calcPrice();
+        }
+
+        // --- Print Event ---
+        document.getElementById('printBtn').addEventListener('click', () => {
+            renderer.render(scene, camera);
+            const imgData = renderer.domElement.toDataURL('image/png');
+            let sList = "";
+            
+            sList+=`<li>Type: ${ui.deckType.options[ui.deckType.selectedIndex].text}</li>`;
+            
+            if(ui.skirt.checked && ui.deckType.value !== 'patio') sList+="<li>Solid Skirting</li>";
+            if(ui.screen.checked) sList+="<li>Screen on 3 Sides w/ Door</li>";
+            if(ui.noRails.checked) sList+="<li>No Railings</li>";
+            if(ui.ramp.checked && ui.deckType.value !== 'patio') sList+=`<li>ADA Ramp (${(ui.height.value * 0.75).toFixed(1)} ft length) on ${ui.rampSide.options[ui.rampSide.selectedIndex].text}</li>`;
+            if(ui.gate.checked) sList+='<li>Aluminum Gate 36" w/ Latch</li>';
+            if(ui.low.checked) sList+="<li>Low Rise Steps</li>";
+            if(ui.deckType.value === 'pool') sList+=`<li>Pool Deck Radius Cut (Sized for ${ui.poolSelect.options[ui.poolSelect.selectedIndex].text})</li>`;
+            if(ui.deckType.value === 'stocktank') sList+=`<li>Stock Tank Deck Center Cutout (${ui.tankSize.value} ft diameter)</li>`;
+            
+            const exCount = parseInt(ui.exStep.value) || 0;
+            if(exCount > 0) {
+                const step2sideText = ui.side2.options[ui.side2.selectedIndex].text;
+                sList+=`<li>${exCount} Extra Set(s) of Steps (Width: ${ui.exStepW.value} ft) - Next set on ${step2sideText}</li>`;
+            }
+            if(ui.wStep.value > 0) sList+=`<li>Main Steps Wider Add-on (+${ui.wStep.value} Linear Ft)</li>`;
+            
+            const cPrice = parseFloat(ui.custPrice.value) || 0;
+            if(cPrice > 0) {
+                const cDesc = ui.custDesc.value || 'Custom Add-on';
+                sList += `<li>${cDesc} (+$${cPrice.toFixed(2)})</li>`;
+            }
+
+            const hasRoof = ui.roofStyle.value !== 'none';
+            const roofText = hasRoof ? ui.roofC.options[ui.roofC.selectedIndex].text + (ui.roofStyle.value === 'slant' ? ' (Metal Slant)' : ' (A-Frame)') : 'No Roof';
+            
+            const qDate = new Date().toLocaleDateString();
+            const qNum = Math.floor(10000 + Math.random() * 90000);
+            
+            const custName = ui.cName.value || "______________________";
+            const custPhone = ui.cPhone.value || "______________________";
+            const custAddr = ui.cAddr.value || "______________________";
+            
+            const mainStepText = ui.side.value === 'none' ? 'None' : `Attached to ${ui.side.options[ui.side.selectedIndex].text}`;
+
+            document.getElementById('printArea').innerHTML = `
+                <div class="print-header">
+                    <h1>Timbercraft Master Deck Quote</h1>
+                </div>
+                
+                <div class="print-customer-box">
+                    <div>
+                        <strong>Customer Details</strong><br>
+                        Name: ${custName}<br>
+                        Phone: ${custPhone}<br>
+                        Address: ${custAddr}
+                    </div>
+                    <div style="text-align: right;">
+                        <strong>Quote Info</strong><br>
+                        Date: ${qDate}<br>
+                        Quote #: TC-${qNum}
+                    </div>
+                </div>
+
+                <img src="${imgData}" class="print-image">
+                
+                <div class="print-specs">
+                    <p><strong>Size:</strong> ${ui.size.value.replace('x', ' x ')}</p>
+                    <p><strong>Height:</strong> ${ui.deckType.value === 'patio' ? 'Patio Ground Level' : ui.height.value + ' Inches'}</p>
+                    <p><strong>Wood Stain:</strong> ${ui.stain.options[ui.stain.selectedIndex].text}</p>
+                    <p><strong>Roofing:</strong> ${roofText}</p>
+                    <p><strong>Main Steps:</strong> ${mainStepText}</p>
+                    <p><strong>Delivery:</strong> ${ui.del.options[ui.del.selectedIndex].text}</p>
+                    <p><strong>Upgrades & Add-ons:</strong></p><ul>${sList||"<li>None</li>"}</ul>
+                </div>
+                <div class="print-price-box">
+                    <div style="font-size: 16px; margin-bottom: 5px;">Subtotal: ${document.getElementById('subtotalPrice').innerText}</div>
+                    <div style="font-size: 16px; margin-bottom: 10px;">Tax: ${document.getElementById('taxAmount').innerText}</div>
+                    <div class="print-total">Total Price: ${document.getElementById('totalPrice').innerText}</div>
+                    <div class="print-rto">36-Month RTO: ${document.getElementById('rto36').innerText}</div>
+                    <div class="print-rto">48-Month RTO: ${document.getElementById('rto48').innerText}</div>
+                </div>
+            `;
+            
+            setTimeout(() => { window.print(); }, 300);
+        });
+
+        // --- Save HTML File Event ---
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            document.querySelectorAll('input, select').forEach(el => {
+                if (el.type === 'checkbox') {
+                    if (el.checked) el.setAttribute('checked', 'checked');
+                    else el.removeAttribute('checked');
+                } else if (el.tagName === 'SELECT') {
+                    Array.from(el.options).forEach(opt => {
+                        if (opt.value === el.value) opt.setAttribute('selected', 'selected');
+                        else opt.removeAttribute('selected');
+                    });
+                } else {
+                    el.setAttribute('value', el.value);
+                }
+            });
+
+            const htmlContent = document.documentElement.outerHTML;
+            let custName = document.getElementById('custName').value.trim().replace(/[^a-z0-9]/gi, '_');
+            if (!custName) custName = "New_Customer";
+            const filename = "Timbercraft_Project_" + custName + ".html";
+
+            const blob = new Blob(["<!DOCTYPE html>\n", htmlContent], { type: "text/html" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        Object.values(ui).forEach(el => { 
+            if(el && el.tagName !== 'DIV') { 
+                el.addEventListener('change', buildDeck); 
+                el.addEventListener('input', buildDeck); 
+            }
+        });
+        
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('pointerdown', (event) => {
+            if(event.target.tagName !== 'CANVAS') return;
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(deckGroup.children, true);
+            if (intersects.length > 0) {
+                const clickedObj = intersects[0].object;
+                if (clickedObj.userData && clickedObj.userData.isGateMesh) {
+                    const p = clickedObj.userData.pivot;
+                    p.userData.targetAngle = (p.userData.targetAngle === 0) ? Math.PI / 2 : 0;
+                }
+            }
+        });
+
+        window.addEventListener('pointermove', (event) => {
+            if(event.target.tagName !== 'CANVAS') {
+                document.body.style.cursor = 'default';
+                return;
+            }
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(deckGroup.children, true);
+            let isHovering = false;
+            for(let i=0; i<intersects.length; i++) {
+                if(intersects[i].object.userData && intersects[i].object.userData.isGateMesh) {
+                    isHovering = true;
+                    break;
+                }
+            }
+            document.body.style.cursor = isHovering ? 'pointer' : 'default';
+        });
+
+        window.addEventListener('resize', () => { camera.aspect=window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight);});
+        buildDeck();
+        
+        function animate() { 
+            requestAnimationFrame(animate); 
+            controls.update(); 
+            
+            deckGroup.traverse((child) => {
+                if (child.userData && child.userData.isGatePivot) {
+                    child.rotation.y += (child.userData.targetAngle - child.rotation.y) * 0.1;
+                }
+            });
+
+            renderer.render(scene, camera); 
+        } 
+        animate();
+    </script>
+</body>
+</html>

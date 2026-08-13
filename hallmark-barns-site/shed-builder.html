@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hallmark Spencer | Custom Shed Configurator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; overflow: hidden; font-family: 'Montserrat', sans-serif; background: #f0f3f5; }
+        #ui { position: absolute; left: 20px; top: 20px; width: 350px; background: rgba(255,255,255,0.95); padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; z-index: 100; border-top: 5px solid #f39c12; }
+        h1 { font-size: 1.2rem; color: #1a1a1a; margin-top: 0; text-transform: uppercase; letter-spacing: 1px; }
+        .control-group { margin-bottom: 20px; }
+        label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 5px; color: #555; }
+        select, input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; font-size: 0.9rem; }
+        .color-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 5px; }
+        .color-swatch { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.2s; }
+        .color-swatch:hover { transform: scale(1.2); }
+        .color-swatch.active { border-color: #f39c12; transform: scale(1.1); }
+        .price-panel { background: #2c3e50; color: #fff; padding: 20px; border-radius: 10px; margin-top: 20px; }
+        .price-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
+        .total { font-size: 1.5rem; font-weight: 900; color: #27ae60; border-top: 1px solid #4a6278; padding-top: 10px; margin-top: 10px; }
+        .rto-box { font-size: 0.8rem; color: #f39c12; font-weight: 700; margin-top: 5px; }
+        .btn-send { background: #f39c12; color: #fff; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: 900; text-transform: uppercase; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn-send:hover { background: #e67e22; transform: translateY(-3px); }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+<div id="ui">
+    <h1>Custom Shed Modeler</h1>
+    
+    <div class="control-group">
+        <label>Building Style</label>
+        <select id="style">
+            <option value="utility">Utility Shed (A-Frame)</option>
+            <option value="barn">Lofted Barn (Gambrel)</option>
+            <option value="cabin">Cabin (with Porch)</option>
+        </select>
+    </div>
+
+    <div class="control-group">
+        <label>Size</label>
+        <select id="size">
+            <option value="8x12">8 x 12</option>
+            <option value="10x16">10 x 16</option>
+            <option value="12x20">12 x 20</option>
+            <option value="12x24">12 x 24</option>
+            <option value="14x40">14 x 40</option>
+        </select>
+    </div>
+
+    <div class="control-group">
+        <label>Siding Color (LP SmartSide)</label>
+        <div id="siding-colors" class="color-grid">
+            <!-- Injected -->
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label>Trim Color</label>
+        <div id="trim-colors" class="color-grid">
+            <!-- Injected -->
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label>Metal Roof Color</label>
+        <div id="roof-colors" class="color-grid">
+            <!-- Injected -->
+        </div>
+    </div>
+
+    <div class="control-group">
+        <label>Add Windows (+$100 ea)</label>
+        <input type="number" id="windows" value="0" min="0" max="10">
+    </div>
+
+    <div class="price-panel">
+        <div class="price-row"><span>Base Price:</span><span id="base-price">$2,942.00</span></div>
+        <div class="price-row"><span>Options:</span><span id="options-price">$0.00</span></div>
+        <div class="price-row total"><span>Est. Total:</span><span id="total-price">$2,942.00</span></div>
+        <div class="rto-box" id="rto-val">36 Mo RTO: $136.20 / mo</div>
+    </div>
+
+    <button class="btn-send">Send Design to Jared</button>
+</div>
+
+<script>
+    // --- Data ---
+    const colors = {
+        siding: [
+            {name: 'Hi Hide White', hex: '#F3F3F1'}, {name: 'Navajo White', hex: '#EBE0C8'}, {name: 'Basswood', hex: '#A28F76'},
+            {name: 'Dark Brown', hex: '#4C3C2E'}, {name: 'Gray', hex: '#51585C'}, {name: 'Light Gray', hex: '#A9ACAC'},
+            {name: 'Riehl Green', hex: '#183F32'}, {name: 'Navy Blue', hex: '#2B3D51'}, {name: 'Honey Gold', hex: '#D18E2B'}
+        ],
+        metal: [
+            {name: 'Black', hex: '#15191C'}, {name: 'Charcoal', hex: '#646864'}, {name: 'Burnished Slate', hex: '#4D4C44'},
+            {name: 'Brite Red', hex: '#AC3A2E'}, {name: 'Gallery Blue', hex: '#174C74'}, {name: 'Dark Green', hex: '#004333'}
+        ]
+    };
+
+    const basePrices = {
+        '8x12': 2942, '10x16': 4554, '12x20': 6506, '12x24': 7443, '14x40': 12500
+    };
+
+    // --- State ---
+    let state = {
+        style: 'utility', size: '8x12', siding: '#A9ACAC', trim: '#F3F3F1', roof: '#646864', windows: 0
+    };
+
+    // --- Three.js Engine ---
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xdce8f2);
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    camera.position.set(15, 15, 25);
+    controls.update();
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    const sun = new THREE.DirectionalLight(0xffffff, 0.8);
+    sun.position.set(10, 20, 10);
+    scene.add(sun);
+
+    let buildingGroup = new THREE.Group();
+    scene.add(buildingGroup);
+
+    // Materials
+    const sidingMat = new THREE.MeshStandardMaterial({ color: state.siding });
+    const trimMat = new THREE.MeshStandardMaterial({ color: state.trim });
+    const roofMat = new THREE.MeshStandardMaterial({ color: state.roof, metalness: 0.5, roughness: 0.3 });
+    const glassMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, transparent: true, opacity: 0.6 });
+
+    function updateMaterials() {
+        sidingMat.color.set(state.siding);
+        trimMat.color.set(state.trim);
+        roofMat.color.set(state.roof);
+    }
+
+    function createBuilding() {
+        buildingGroup.clear();
+        
+        const dims = state.size.split('x').map(n => parseInt(n) / 2); // simplistic scale
+        const w = dims[0], d = dims[1], h = 4;
+
+        // Main Box
+        const bodyGeo = new THREE.BoxGeometry(w*2, h*2, d*2);
+        const body = new THREE.Mesh(bodyGeo, sidingMat);
+        body.position.y = h;
+        buildingGroup.add(body);
+
+        // Roof
+        if(state.style === 'utility') {
+            const roofGeo = new THREE.ConeGeometry(w*1.5, 3, 4);
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.position.y = h*2 + 1.5;
+            roof.rotation.y = Math.PI / 4;
+            buildingGroup.add(roof);
+        } else {
+            // Gambrel / Lofted
+            const roofGeo = new THREE.CylinderGeometry(w*1.2, w*1.2, d*2, 4);
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.position.y = h*2 + 1;
+            roof.rotation.z = Math.PI / 2;
+            roof.rotation.y = Math.PI / 4;
+            buildingGroup.add(roof);
+        }
+
+        // Windows
+        for(let i=0; i<state.windows; i++) {
+            const win = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 2), glassMat);
+            win.position.set(w + 0.05, h + 1, -d + (i*3) + 2);
+            win.rotation.y = Math.PI / 2;
+            buildingGroup.add(win);
+            
+            // Frame
+            const frame = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.2, 1.7), trimMat);
+            frame.position.set(w, h + 1, -d + (i*3) + 2);
+            buildingGroup.add(frame);
+        }
+
+        updatePricing();
+    }
+
+    function updatePricing() {
+        const base = basePrices[state.size] || 2000;
+        const opts = state.windows * 100;
+        const total = base + opts;
+        
+        document.getElementById('base-price').innerText = '$' + base.toLocaleString();
+        document.getElementById('options-price').innerText = '$' + opts.toLocaleString();
+        document.getElementById('total-price').innerText = '$' + total.toLocaleString();
+        document.getElementById('rto-val').innerText = '36 Mo RTO: $' + (total / 21.6).toFixed(2) + ' / mo';
+    }
+
+    // --- UI Init ---
+    function renderSwatches(containerId, type, stateKey) {
+        const container = document.getElementById(containerId);
+        const list = type === 'metal' ? colors.metal : colors.siding;
+        list.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'color-swatch';
+            div.style.backgroundColor = c.hex;
+            div.title = c.name;
+            div.onclick = () => {
+                state[stateKey] = c.hex;
+                document.querySelectorAll(`#${containerId} .color-swatch`).forEach(s => s.classList.remove('active'));
+                div.classList.add('active');
+                updateMaterials();
+            };
+            container.appendChild(div);
+        });
+    }
+
+    renderSwatches('siding-colors', 'siding', 'siding');
+    renderSwatches('trim-colors', 'siding', 'trim');
+    renderSwatches('roof-colors', 'metal', 'roof');
+
+    document.getElementById('style').onchange = (e) => { state.style = e.target.value; createBuilding(); };
+    document.getElementById('size').onchange = (e) => { state.size = e.target.value; createBuilding(); };
+    document.getElementById('windows').oninput = (e) => { state.windows = parseInt(e.target.value); createBuilding(); };
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    createBuilding();
+    function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
+    animate();
+
+</script>
+</body>
+</html>
