@@ -202,17 +202,40 @@
         "Accessory": {"3' x 5' Ramp": 175, "6' x 5' Ramp": 225, "9' x 5' Ramp": 275, "Workbench (24\")": 9}
     };
 
-    const colors = [
-        { name: 'Crimson Red', hex: '#8b0000' },
-        { name: 'Charcoal', hex: '#333333' },
-        { name: 'Light Gray', hex: '#cccccc' },
-        { name: 'Tan', hex: '#d2b48c' },
-        { name: 'White', hex: '#ffffff' },
-        { name: 'Hunter Green', hex: '#006400' },
-        { name: 'Blue', hex: '#0000ff' },
-        { name: 'Brown', hex: '#8b4513' },
-        { name: 'Clay', hex: '#a5a58d' },
-        { name: 'Black', hex: '#000000' }
+    const sidingColors = [
+        { name: 'Hi Hide White', hex: '#F5F3F1' },
+        { name: 'Navajo White', hex: '#EEE1C8' },
+        { name: 'Basswood', hex: '#A28F77' },
+        { name: 'Dark Brown', hex: '#4D3E33' },
+        { name: 'Pink', hex: '#DDB1C2' },
+        { name: 'Mountain Red', hex: '#602525' },
+        { name: 'Riehl Green', hex: '#1C3D2E' },
+        { name: 'Navy Blue', hex: '#2B384D' },
+        { name: 'Gray', hex: '#52585A' },
+        { name: 'Light Gray', hex: '#A8ADAD' },
+        { name: 'Black', hex: '#000000' },
+        { name: 'Chestnut Brown (Stain)', hex: '#8B5D34' },
+        { name: 'Honey Gold (Stain)', hex: '#C7882C' },
+        { name: 'Driftwood (Stain)', hex: '#8D8679' },
+        { name: 'Red Mahogany (Stain)', hex: '#BA492B' },
+        { name: 'Cedar (Stain)', hex: '#C2842E' }
+    ];
+
+    const roofColors = [
+        { name: 'Brite Red', hex: '#A83526' },
+        { name: 'Brite White', hex: '#E5EAE9' },
+        { name: 'Light Stone', hex: '#D1D1BE' },
+        { name: 'Charcoal Gray', hex: '#5F615D' },
+        { name: 'Taupe', hex: '#95948A' },
+        { name: 'Gallery Blue', hex: '#14446B' },
+        { name: 'Dark Green', hex: '#003B2D' },
+        { name: 'Tan', hex: '#B3A183' },
+        { name: 'Cocoa Brown', hex: '#514136' },
+        { name: 'Burnished Slate', hex: '#4C4D44' },
+        { name: 'Black', hex: '#14171A' },
+        { name: 'Ash Gray', hex: '#A8ADAA' },
+        { name: 'Galvalume', hex: '#BCC6C9' },
+        { name: 'Copper Metallic', hex: '#9E7444' }
     ];
 
     // --- 3D ENGINE ---
@@ -260,7 +283,7 @@
 
         // Wall Material (LP SmartSide Style)
         const wallMat = new THREE.MeshStandardMaterial({ 
-            color: '#cccccc',
+            color: '#A8ADAD',
             roughness: 0.8,
             metalness: 0.1
         });
@@ -274,7 +297,7 @@
 
         // Roof Material (Metal Style)
         const roofMat = new THREE.MeshStandardMaterial({ 
-            color: '#333333',
+            color: '#5F615D',
             roughness: 0.5,
             metalness: 0.5
         });
@@ -330,10 +353,11 @@
         const sidingGrid = document.getElementById('siding-colors');
         const roofGrid = document.getElementById('roof-colors');
 
-        colors.forEach(c => {
+        sidingColors.forEach(c => {
             const sBox = document.createElement('div');
             sBox.className = 'color-box';
             sBox.style.backgroundColor = c.hex;
+            sBox.title = c.name;
             if (c.name === 'Light Gray') sBox.classList.add('active');
             sBox.onclick = () => {
                 components.walls.material.color.set(c.hex);
@@ -341,11 +365,14 @@
                 sBox.classList.add('active');
             };
             sidingGrid.appendChild(sBox);
+        });
 
+        roofColors.forEach(c => {
             const rBox = document.createElement('div');
             rBox.className = 'color-box';
             rBox.style.backgroundColor = c.hex;
-            if (c.name === 'Charcoal') rBox.classList.add('active');
+            rBox.title = c.name;
+            if (c.name === 'Charcoal Gray') rBox.classList.add('active');
             rBox.onclick = () => {
                 components.roof.material.color.set(c.hex);
                 document.querySelectorAll('#roof-colors .color-box').forEach(el => el.classList.remove('active'));
