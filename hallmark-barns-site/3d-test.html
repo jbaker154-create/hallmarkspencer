@@ -281,11 +281,25 @@
         if (shed) scene.remove(shed);
         shed = new THREE.Group();
 
+        // Load textures and set wrapping for LP SmartSide
+        const wallNormalTex = textureLoader.load('lp_smartside_normal.png');
+        wallNormalTex.wrapS = THREE.RepeatWrapping;
+        wallNormalTex.wrapT = THREE.RepeatWrapping;
+        wallNormalTex.repeat.set(6, 4); // Scale to fit the walls realistically
+
+        const wallRoughTex = textureLoader.load('lp_smartside_roughness.png');
+        wallRoughTex.wrapS = THREE.RepeatWrapping;
+        wallRoughTex.wrapT = THREE.RepeatWrapping;
+        wallRoughTex.repeat.set(6, 4);
+
         // Wall Material (LP SmartSide Style)
         const wallMat = new THREE.MeshStandardMaterial({ 
             color: '#A8ADAD',
             roughness: 0.8,
-            metalness: 0.1
+            metalness: 0.1,
+            normalMap: wallNormalTex,
+            normalScale: new THREE.Vector2(1.5, 1.5),
+            roughnessMap: wallRoughTex
         });
 
         const wallGeom = new THREE.BoxGeometry(10, 8, 16);
@@ -295,11 +309,25 @@
         components.walls.receiveShadow = true;
         shed.add(components.walls);
 
+        // Load textures and set wrapping for Metal Roof
+        const roofNormalTex = textureLoader.load('metal_roof_normal.png');
+        roofNormalTex.wrapS = THREE.RepeatWrapping;
+        roofNormalTex.wrapT = THREE.RepeatWrapping;
+        roofNormalTex.repeat.set(12, 4);
+
+        const roofRoughTex = textureLoader.load('metal_roof_roughness.png');
+        roofRoughTex.wrapS = THREE.RepeatWrapping;
+        roofRoughTex.wrapT = THREE.RepeatWrapping;
+        roofRoughTex.repeat.set(12, 4);
+
         // Roof Material (Metal Style)
         const roofMat = new THREE.MeshStandardMaterial({ 
             color: '#5F615D',
-            roughness: 0.5,
-            metalness: 0.5
+            roughness: 0.3,
+            metalness: 0.7,
+            normalMap: roofNormalTex,
+            normalScale: new THREE.Vector2(1.0, 1.0),
+            roughnessMap: roofRoughTex
         });
 
         const roofGeom = new THREE.ConeGeometry(7.2, 3.5, 4);
@@ -434,6 +462,18 @@
         if (dims.length === 2 && components.walls) {
             components.walls.scale.set(dims[0]/10, 1, dims[1]/16);
             components.roof.scale.set(dims[0]/10, 1, dims[1]/11.2);
+            
+            // Dynamically adjust texture repeat to prevent stretching and keep grooves realistic!
+            const wallNormal = components.walls.material.normalMap;
+            const wallRough = components.walls.material.roughnessMap;
+            if (wallNormal) wallNormal.repeat.set(dims[0]/1.5, 4);
+            if (wallRough) wallRough.repeat.set(dims[0]/1.5, 4);
+            
+            const roofNormal = components.roof.material.normalMap;
+            const roofRough = components.roof.material.roughnessMap;
+            if (roofNormal) roofNormal.repeat.set(dims[0], 4);
+            if (roofRough) roofRough.repeat.set(dims[0], 4);
+
             // Move door based on size
             components.door.position.x = (dims[0]/2) + 0.01;
         }
