@@ -281,70 +281,151 @@
         if (shed) scene.remove(shed);
         shed = new THREE.Group();
 
-        // Load textures and set wrapping for LP SmartSide
+        // Get current size and style from UI dropdowns
+        const styleSelect = document.getElementById('style-select');
+        const sizeSelect = document.getElementById('size-select');
+        const style = styleSelect ? styleSelect.value : 'Utility Shed';
+        const size = sizeSelect ? sizeSelect.value : '8 x 12';
+        
+        // Parse size dimensions
+        const dims = size.split(' x ').map(v => parseInt(v));
+        const w = dims[0] || 8;
+        const d = dims[1] || 12;
+        const h = 7.5; // Realistic 7.5ft wall height
+
+        // Preserve user-selected colors across rebuilds
+        const savedSidingColor = components.walls ? components.walls.material.color.getHexString() : 'A8ADAD';
+        const savedRoofColor = components.roof ? components.roof.material.color.getHexString() : '5F615D';
+
+        // Load textures and set wrapping for LP SmartSide Siding
         const wallNormalTex = textureLoader.load('lp_smartside_normal.png');
         wallNormalTex.wrapS = THREE.RepeatWrapping;
         wallNormalTex.wrapT = THREE.RepeatWrapping;
-        wallNormalTex.repeat.set(6, 4); // Scale to fit the walls realistically
+        wallNormalTex.repeat.set(w / 1.5, h / 2);
 
         const wallRoughTex = textureLoader.load('lp_smartside_roughness.png');
         wallRoughTex.wrapS = THREE.RepeatWrapping;
         wallRoughTex.wrapT = THREE.RepeatWrapping;
-        wallRoughTex.repeat.set(6, 4);
+        wallRoughTex.repeat.set(w / 1.5, h / 2);
 
         // Wall Material (LP SmartSide Style)
         const wallMat = new THREE.MeshStandardMaterial({ 
-            color: '#A8ADAD',
+            color: new THREE.Color('#' + savedSidingColor),
             roughness: 0.8,
             metalness: 0.1,
             normalMap: wallNormalTex,
-            normalScale: new THREE.Vector2(1.5, 1.5),
+            normalScale: new THREE.Vector2(3.0, 3.0), // Deep groove shadow depth!
             roughnessMap: wallRoughTex
         });
 
-        const wallGeom = new THREE.BoxGeometry(10, 8, 16);
-        components.walls = new THREE.Mesh(wallGeom, wallMat);
-        components.walls.position.y = 4;
-        components.walls.castShadow = true;
-        components.walls.receiveShadow = true;
-        shed.add(components.walls);
-
-        // Load textures and set wrapping for Metal Roof
+        // Load textures and set wrapping for standing-seam Metal Roof
         const roofNormalTex = textureLoader.load('metal_roof_normal.png');
         roofNormalTex.wrapS = THREE.RepeatWrapping;
         roofNormalTex.wrapT = THREE.RepeatWrapping;
-        roofNormalTex.repeat.set(12, 4);
+        roofNormalTex.repeat.set(w, d / 2);
 
         const roofRoughTex = textureLoader.load('metal_roof_roughness.png');
         roofRoughTex.wrapS = THREE.RepeatWrapping;
         roofRoughTex.wrapT = THREE.RepeatWrapping;
-        roofRoughTex.repeat.set(12, 4);
+        roofRoughTex.repeat.set(w, d / 2);
 
         // Roof Material (Metal Style)
         const roofMat = new THREE.MeshStandardMaterial({ 
-            color: '#5F615D',
-            roughness: 0.3,
-            metalness: 0.7,
+            color: new THREE.Color('#' + savedRoofColor),
+            roughness: 0.35,
+            metalness: 0.65,
             normalMap: roofNormalTex,
-            normalScale: new THREE.Vector2(1.0, 1.0),
+            normalScale: new THREE.Vector2(2.0, 2.0),
             roughnessMap: roofRoughTex
         });
 
-        const roofGeom = new THREE.ConeGeometry(7.2, 3.5, 4);
+        // Trim Material
+        const trimMat = new THREE.MeshStandardMaterial({
+            color: 0xF5F3F1, // Hi Hide White
+            roughness: 0.7,
+            metalness: 0.1
+        });
+
+        // Floor platform material (Treated Wood Skids)
+        const floorMat = new THREE.MeshStandardMaterial({
+            color: 0x5c4033, // Pressure-treated dark brown wood
+            roughness: 0.9,
+            metalness: 0.1
+        });
+
+        // --- 1. Floor Platform (PT Lumber Foundation) ---
+        const floorGeom = new THREE.BoxGeometry(w + 0.1, 0.6, d + 0.1);
+        const floor = new THREE.Mesh(floorGeom, floorMat);
+        floor.position.y = 0.3;
+        floor.castShadow = true;
+        floor.receiveShadow = true;
+        shed.add(floor);
+
+        // --- 2. Main Wall Body ---
+        const wallGeom = new THREE.BoxGeometry(w, h, d);
+        components.walls = new THREE.Mesh(wallGeom, wallMat);
+        components.walls.position.y = h/2 + 0.6; // elevated on top of foundation
+        components.walls.castShadow = true;
+        components.walls.receiveShadow = true;
+        shed.add(components.walls);
+
+        // --- 3. Corner Trims (4 vertical corner caps) ---
+        const trimW = 0.35;
+        const cornerCoords = [
+            { x: -w/2, z: -d/2 },
+            { x: w/2, z: -d/2 },
+            { x: -w/2, z: d/2 },
+            { x: w/2, z: d/2 }
+        ];
+        cornerCoords.forEach(c => {
+            const trimGeom = new THREE.BoxGeometry(trimW, h + 0.05, trimW);
+            const trim = new THREE.Mesh(trimGeom, trimMat);
+            trim.position.set(c.x, h/2 + 0.6, c.z);
+            trim.castShadow = true;
+            shed.add(trim);
+        });
+
+        // --- 4. Double Doors (Front Wall) ---
+        const doorW = 5.5, doorH = 6.2;
+        const doorGroup = new THREE.Group();
+        doorGroup.position.set(0, doorH/2 + 0.6, d/2 + 0.05); // centered on front wall
+
+        // Door Frame / Trim Outline
+        const frameGeom = new THREE.BoxGeometry(doorW + 0.4, doorH + 0.2, 0.1);
+        const frame = new THREE.Mesh(frameGeom, trimMat);
+        doorGroup.add(frame);
+
+        // Left door leaf with panel borders
+        const leftLeafGeom = new THREE.BoxGeometry(doorW/2, doorH, 0.15);
+        const leftLeaf = new THREE.Mesh(leftLeafGeom, trimMat);
+        leftLeaf.position.set(-doorW/4, 0, 0.05);
+        doorGroup.add(leftLeaf);
+
+        // Right door leaf
+        const rightLeafGeom = new THREE.BoxGeometry(doorW/2, doorH, 0.15);
+        const rightLeaf = new THREE.Mesh(rightLeafGeom, trimMat);
+        rightLeaf.position.set(doorW/4, 0, 0.05);
+        doorGroup.add(rightLeaf);
+
+        // Black Metal T-handle lock latch
+        const latchGeom = new THREE.BoxGeometry(0.1, 0.4, 0.25);
+        const latchMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5 });
+        const latch = new THREE.Mesh(latchGeom, latchMat);
+        latch.position.set(0.1, 0, 0.15);
+        doorGroup.add(latch);
+
+        shed.add(doorGroup);
+        components.door = doorGroup; // hook for toggling visibility
+
+        // --- 5. Gable / A-Frame Roof ---
+        const roofHeight = w * 0.25; // standard pitch
+        const roofGeom = new THREE.ConeGeometry(w * 0.72, roofHeight, 4);
         roofGeom.rotateY(Math.PI / 4);
         components.roof = new THREE.Mesh(roofGeom, roofMat);
-        components.roof.position.y = 9.75;
-        components.roof.scale.set(1, 1, 16 / 7.2);
+        components.roof.position.y = h + 0.6 + roofHeight/2;
+        components.roof.scale.set(1, 1, d / (w * 0.72));
         components.roof.castShadow = true;
         shed.add(components.roof);
-
-        // Simple procedural door
-        const doorGeom = new THREE.PlaneGeometry(3, 6);
-        const doorMat = new THREE.MeshStandardMaterial({ color: '#ffffff', side: THREE.DoubleSide });
-        components.door = new THREE.Mesh(doorGeom, doorMat);
-        components.door.position.set(5.01, 3, 0); // Side of building
-        components.door.rotateY(Math.PI / 2);
-        shed.add(components.door);
 
         scene.add(shed);
     }
@@ -457,26 +538,8 @@
 
         document.getElementById('price-display').innerText = '$' + total.toLocaleString(undefined, {minimumFractionDigits: 2});
         
-        // Update 3D Scale
-        const dims = size.split(' x ').map(v => parseInt(v));
-        if (dims.length === 2 && components.walls) {
-            components.walls.scale.set(dims[0]/10, 1, dims[1]/16);
-            components.roof.scale.set(dims[0]/10, 1, dims[1]/11.2);
-            
-            // Dynamically adjust texture repeat to prevent stretching and keep grooves realistic!
-            const wallNormal = components.walls.material.normalMap;
-            const wallRough = components.walls.material.roughnessMap;
-            if (wallNormal) wallNormal.repeat.set(dims[0]/1.5, 4);
-            if (wallRough) wallRough.repeat.set(dims[0]/1.5, 4);
-            
-            const roofNormal = components.roof.material.normalMap;
-            const roofRough = components.roof.material.roughnessMap;
-            if (roofNormal) roofNormal.repeat.set(dims[0], 4);
-            if (roofRough) roofRough.repeat.set(dims[0], 4);
-
-            // Move door based on size
-            components.door.position.x = (dims[0]/2) + 0.01;
-        }
+        // Rebuild the 3D model with exact real-world dimensions (zero texture stretching!)
+        createShed();
     }
 
     window.addEventListener('load', () => {
