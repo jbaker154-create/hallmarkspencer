@@ -152,7 +152,7 @@
 
     <div id="sidebar">
         <div class="logo-area">
-            <img src="https://hallmarkbarns.com/wp-content/uploads/2023/11/hallmark-logo.png" alt="Hallmark Spencer">
+            <div style="font-weight: 900; font-size: 1.5rem; color: var(--accent); letter-spacing: 1px;">HALLMARK SPENCER</div>
             <h2>DESIGNER</h2>
         </div>
 
@@ -409,17 +409,32 @@
         floor.receiveShadow = true;
         shed.add(floor);
 
-        // --- 2. Main Wall Body ---
-        const wallGeom = new THREE.BoxGeometry(w, h, d);
+        // Determine Porch Layout for Cabin
+        const hasPorch = (style === 'Cabin');
+        const porchDepth = 4.0;
+        const actualWallDepth = hasPorch ? d - porchDepth : d;
+
+        // --- 2. Main Wall Body (Surgically handles Cabin porch cut-out!) ---
+        const wallGeom = new THREE.BoxGeometry(w, h, actualWallDepth);
         components.walls = new THREE.Mesh(wallGeom, wallMat);
-        components.walls.position.y = h/2 + 0.6; // elevated on top of foundation
+        // Position walls on foundation
+        if (hasPorch) {
+            components.walls.position.set(0, h/2 + 0.6, -porchDepth/2);
+        } else {
+            components.walls.position.set(0, h/2 + 0.6, 0);
+        }
         components.walls.castShadow = true;
         components.walls.receiveShadow = true;
         shed.add(components.walls);
 
         // --- 3. Corner Trims (4 vertical corner caps) ---
         const trimW = 0.35;
-        const cornerCoords = [
+        const cornerCoords = hasPorch ? [
+            { x: -w/2, z: -d/2 },
+            { x: w/2, z: -d/2 },
+            { x: -w/2, z: d/2 - porchDepth },
+            { x: w/2, z: d/2 - porchDepth }
+        ] : [
             { x: -w/2, z: -d/2 },
             { x: w/2, z: -d/2 },
             { x: -w/2, z: d/2 },
@@ -433,10 +448,42 @@
             shed.add(trim);
         });
 
+        // --- Cabin Porch Columns and Railings ---
+        if (hasPorch) {
+            const postGeo = new THREE.BoxGeometry(0.35, h, 0.35);
+            
+            // Left Column
+            const postL = new THREE.Mesh(postGeo, trimMat);
+            postL.position.set(-w/2 + 0.2, h/2 + 0.6, d/2 - 0.2);
+            postL.castShadow = true;
+            shed.add(postL);
+
+            // Right Column
+            const postR = new THREE.Mesh(postGeo, trimMat);
+            postR.position.set(w/2 - 0.2, h/2 + 0.6, d/2 - 0.2);
+            postR.castShadow = true;
+            shed.add(postR);
+
+            // Middle Column
+            const postM = new THREE.Mesh(postGeo, trimMat);
+            postM.position.set(0, h/2 + 0.6, d/2 - 0.2);
+            postM.castShadow = true;
+            shed.add(postM);
+
+            // Porch Deck Floor (Beautiful treated planks!)
+            const deckGeo = new THREE.BoxGeometry(w, 0.05, porchDepth);
+            const deck = new THREE.Mesh(deckGeo, floorMat);
+            deck.position.set(0, 0.6, d/2 - porchDepth/2);
+            deck.receiveShadow = true;
+            shed.add(deck);
+        }
+
         // --- 4. Double Doors (Front Wall) ---
         const doorW = 5.5, doorH = 6.2;
         const doorGroup = new THREE.Group();
-        doorGroup.position.set(0, doorH/2 + 0.6, d/2 + 0.05); // centered on front wall
+        // Position doors on front of main wall body
+        const doorZ = hasPorch ? (d/2 - porchDepth + 0.05) : (d/2 + 0.05);
+        doorGroup.position.set(0, doorH/2 + 0.6, doorZ);
 
         // Door Frame / Trim Outline
         const frameGeom = new THREE.BoxGeometry(doorW + 0.4, doorH + 0.2, 0.1);
@@ -465,15 +512,58 @@
         shed.add(doorGroup);
         components.door = doorGroup; // hook for toggling visibility
 
-        // --- 5. Gable / A-Frame Roof ---
+        // --- 5. Realistic Gable Ends & Triangular Prism Roof ---
         const roofHeight = w * 0.25; // standard pitch
-        const roofGeom = new THREE.ConeGeometry(w * 0.72, roofHeight, 4);
-        roofGeom.rotateY(Math.PI / 4);
-        components.roof = new THREE.Mesh(roofGeom, roofMat);
-        components.roof.position.y = h + 0.6 + roofHeight/2;
-        components.roof.scale.set(1, 1, d / (w * 0.72));
-        components.roof.castShadow = true;
-        shed.add(components.roof);
+        const extrudeSettings = { depth: actualWallDepth, bevelEnabled: false };
+
+        // Draw 2D front face of the Gable roof (Triangle)
+        const gableShape = new THREE.Shape();
+        gableShape.moveTo(-w/2, 0);
+        gableShape.lineTo(w/2, 0);
+        gableShape.lineTo(0, roofHeight);
+        gableShape.lineTo(-w/2, 0);
+
+        // Extrude to cover the actual depth of the wall
+        const gableGeo = new THREE.ExtrudeGeometry(gableShape, extrudeSettings);
+        const roofBase = new THREE.Mesh(gableGeo, wallMat);
+        // Extrude goes positive on Z, so we align its start to the back wall
+        const gableZStart = -d/2;
+        roofBase.position.set(0, h + 0.6, gableZStart);
+        roofBase.castShadow = true;
+        roofBase.receiveShadow = true;
+        shed.add(roofBase);
+
+        // Actual sloped roof panels with overhangs (No more floating open gaps!)
+        const roofThickness = 0.15;
+        const roofOverhangX = 0.4;
+        const roofOverhangZ = 0.6; // Overhang at front/back gable ends
+        const totalRoofLength = d + roofOverhangZ * 2;
+
+        // Math for sloped rafters
+        const slopeWidth = Math.sqrt(Math.pow(w/2 + roofOverhangX, 2) + Math.pow(roofHeight, 2));
+        const slopeAngle = Math.atan2(roofHeight, w/2 + roofOverhangX);
+
+        const roofGroup = new THREE.Group();
+        roofGroup.position.set(0, h + 0.6, 0); // local center at top of wall
+
+        // Left Rafter Plate
+        const leftRoofGeo = new THREE.BoxGeometry(slopeWidth, roofThickness, totalRoofLength);
+        const leftRoof = new THREE.Mesh(leftRoofGeo, roofMat);
+        leftRoof.position.set(-(w/2 + roofOverhangX) / 2, roofHeight / 2, 0);
+        leftRoof.rotation.z = slopeAngle;
+        leftRoof.castShadow = true;
+        roofGroup.add(leftRoof);
+
+        // Right Rafter Plate
+        const rightRoofGeo = new THREE.BoxGeometry(slopeWidth, roofThickness, totalRoofLength);
+        const rightRoof = new THREE.Mesh(rightRoofGeo, roofMat);
+        rightRoof.position.set((w/2 + roofOverhangX) / 2, roofHeight / 2, 0);
+        rightRoof.rotation.z = -slopeAngle;
+        rightRoof.castShadow = true;
+        roofGroup.add(rightRoof);
+
+        shed.add(roofGroup);
+        components.roof = leftRoof; // hook for color updates (both use roofMat anyway)
 
         scene.add(shed);
     }
