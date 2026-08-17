@@ -155,10 +155,22 @@
             <div style="font-weight: 900; font-size: 1.5rem; color: var(--accent); letter-spacing: 1px;">HALLMARK SPENCER</div>
             <h2>DESIGNER</h2>
         </div>
+        <button id="view-tour-btn" style="background: #2563eb; color: white; font-weight: 800; border: none; border-radius: 8px; padding: 0.6rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; font-size: 0.85rem; letter-spacing: 0.5px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            TAKE A VIRTUAL TOUR
+        </button>
 
         <div class="section-title">Base Configuration</div>
         <div class="control-group">
+            <label>Building Style</label>
             <select id="style-select"></select>
+        </div>
+        <div class="control-group" id="siding-material-group">
+            <label>Siding Material</label>
+            <select id="siding-material">
+                <option value="wood">LP SmartSide (Wood Siding)</option>
+                <option value="metal">29-gauge Ribbed Metal (Siding)</option>
+            </select>
         </div>
         <div class="control-group">
             <select id="size-select"></select>
@@ -174,8 +186,27 @@
             <div id="roof-colors" class="color-grid"></div>
         </div>
 
-        <div class="section-title">Doors & Windows</div>
-        <div id="options-list"></div>
+        <div class="section-title">Doors & Windows (Interactive)</div>
+        <div class="control-group">
+            <label>Add Extra Window (+$90)</label>
+            <select id="win-select">
+                <option value="0">No Extra Windows</option>
+                <option value="1">1 Window</option>
+                <option value="2">2 Windows</option>
+                <option value="3">3 Windows</option>
+            </select>
+        </div>
+        <div class="control-group" id="window-position-group" style="display:none;">
+            <label>Window Left/Right Position (<span id="win-pos-val">0</span>ft)</label>
+            <input type="range" id="win-position" min="-5" max="5" step="0.5" value="2">
+        </div>
+        <div class="control-group">
+            <label>Door Left/Right Position (<span id="door-pos-val">0</span>ft)</label>
+            <input type="range" id="door-position" min="-4" max="4" step="0.5" value="0">
+        </div>
+
+        <div class="section-title">Accessories & Upgrades</div>
+        <div id="options-list" style="display: grid; grid-template-columns: 1fr; gap: 8px;"></div>
 
         <div class="price-card">
             <div class="price-label">Estimated Total</div>
@@ -237,17 +268,550 @@
 <script>
     // --- INLINED DATA ---
     const pricingData = {
-        "Cabin": {"8 x 12": 3494, "8 x 16": 4402, "8 x 20": 5504, "8 x 24": 6719, "10 x 16": 5386, "10 x 20": 5810, "10 x 24": 6805, "10 x 26": 7369, "12 x 16": 6665, "12 x 20": 7095, "12 x 24": 8084, "12 x 26": 8509, "12 x 28": 8869, "12 x 30": 9218, "12 x 32": 9643, "12 x 34": 10067, "12 x 36": 10492, "12 x 38": 10922, "12 x 40": 11347, "14 x 24": 9438, "14 x 28": 10352, "14 x 32": 11202, "14 x 36": 12051, "14 x 40": 12766, "16 x 24": 10777, "16 x 28": 11992, "16 x 32": 12766, "16 x 36": 13475, "16 x 40": 14185},
-        "Chicken Coop": {"6 x 8": 2849, "8 x 8": 2956, "8 x 10": 3451, "8 x 12": 3972, "8 x 16": 4966, "10 x 12": 4966, "10 x 16": 5692, "10 x 20": 7412},
-        "Deluxe Dog Kennel": {"8 x 12": 4510, "10 x 12": 5671, "10 x 16": 6418, "10 x 20": 6875, "12 x 12": 5821, "12 x 16": 6455, "12 x 20": 7090, "12 x 24": 7718, "12 x 28": 8347, "12 x 32": 8987, "12 x 36": 9610, "12 x 40": 10245, "14 x 16": 7530, "14 x 24": 9003, "14 x 28": 9740, "14 x 32": 11030, "14 x 36": 12406, "14 x 40": 13835, "16 x 16": 8487, "16 x 24": 10288, "16 x 28": 11137, "16 x 32": 12610, "16 x 40": 15808},
-        "Garage": {"12 x 12": 5418, "12 x 16": 6235, "12 x 20": 7090, "12 x 24": 7654, "12 x 28": 8224, "12 x 30": 8509, "12 x 32": 8794, "12 x 34": 9412, "12 x 36": 10003, "12 x 40": 10573, "14 x 20": 8595, "14 x 24": 9218, "14 x 28": 9928, "14 x 32": 10637, "14 x 36": 11632, "14 x 40": 12620, "16 x 24": 10212, "16 x 28": 10997, "16 x 32": 11718, "16 x 36": 12986, "16 x 40": 14185},
-        "Garden Shed": {"6 x 8": 2935, "8 x 8": 2978, "8 x 12": 3214, "8 x 16": 3687, "8 x 20": 4397, "10 x 12": 3542, "10 x 16": 4252, "10 x 20": 5015, "10 x 24": 5784, "12 x 12": 4370, "12 x 16": 5101, "12 x 20": 6031, "12 x 24": 6934, "12 x 28": 7783, "12 x 32": 8154, "12 x 34": 8546, "12 x 36": 9078, "12 x 40": 9933, "14 x 24": 8444, "14 x 28": 9116, "14 x 32": 9928, "14 x 36": 11347, "14 x 40": 12056, "16 x 24": 9826, "16 x 28": 10637, "16 x 32": 11486, "16 x 36": 12341, "16 x 40": 13190},
-        "Lofted Barn": {"8 x 10": 3435, "8 x 12": 3542, "8 x 16": 3865, "8 x 20": 4257, "10 x 12": 4187, "10 x 16": 5155, "10 x 20": 6122, "10 x 24": 7090, "12 x 12": 4832, "12 x 16": 5934, "12 x 20": 6461, "12 x 24": 7310, "12 x 28": 8159, "12 x 32": 8880, "12 x 36": 9718, "12 x 40": 10573, "14 x 20": 9293, "14 x 24": 9863, "14 x 28": 10573, "14 x 32": 11384, "14 x 36": 11992, "14 x 40": 12481, "16 x 24": 10105, "16 x 28": 10858, "16 x 32": 11782, "16 x 36": 12766, "16 x 40": 14185},
-        "Mini Barn": {"8 x 8": 2193, "8 x 10": 2446, "8 x 12": 2623, "8 x 16": 3053, "10 x 12": 3160, "10 x 16": 3676, "10 x 20": 4096, "10 x 24": 4515, "12 x 12": 4106, "12 x 16": 4536, "12 x 20": 5429, "12 x 24": 6170, "12 x 32": 7735},
-        "Utility Shed": {"6 x 8": 2827, "8 x 8": 2881, "8 x 10": 2999, "8 x 12": 3118, "8 x 16": 3607, "10 x 10": 3187, "10 x 12": 3397, "10 x 16": 4106, "10 x 20": 4816, "10 x 24": 5590, "12 x 12": 4252, "12 x 16": 4961, "12 x 20": 5950, "12 x 24": 6810, "12 x 32": 8224, "12 x 34": 8428, "12 x 36": 8729, "12 x 40": 9008, "14 x 24": 7944, "14 x 28": 8799, "14 x 32": 9648, "14 x 36": 10497, "14 x 40": 11492, "16 x 20": 8509, "16 x 24": 9084, "16 x 28": 10003, "16 x 32": 10997, "16 x 36": 11846, "16 x 40": 12841},
-        "Door": {"36\" Barn Door": 150, "36\" Entry Door": 530, "72\" x 72\" Double Door (Std)": 250, "9' x 7' Rollup Garage Door": 850},
-        "Window": {"18\" x 27\" Window": 85, "2' x 3' White Window": 90, "3' x 3' White Window": 110},
-        "Accessory": {"3' x 5' Ramp": 175, "6' x 5' Ramp": 225, "9' x 5' Ramp": 275, "Workbench (24\")": 9}
+    "Cabin": {
+        "8 x 12": 3494,
+        "8 x 16": 4402,
+        "8 x 20": 5504,
+        "8 x 24": 6719,
+        "10 x 16": 5386,
+        "10 x 20": 5810,
+        "10 x 24": 6805,
+        "10 x 26": 7369,
+        "12 x 16": 6665,
+        "12 x 20": 7095,
+        "12 x 24": 8084,
+        "12 x 26": 8509,
+        "12 x 28": 8869,
+        "12 x 30": 9218,
+        "12 x 32": 9643,
+        "12 x 34": 10067,
+        "12 x 36": 10492,
+        "12 x 38": 10922,
+        "12 x 40": 11347,
+        "14 x 24": 9438,
+        "14 x 28": 10352,
+        "14 x 32": 11202,
+        "14 x 36": 12051,
+        "14 x 40": 12766,
+        "16 x 24": 10777,
+        "16 x 28": 11992,
+        "16 x 32": 12766,
+        "16 x 36": 13475,
+        "16 x 40": 14185
+    },
+    "Lofted Cabin": {
+        "8 x 12": 3843,
+        "8 x 16": 4838,
+        "8 x 20": 6052,
+        "8 x 24": 7391,
+        "10 x 16": 5956,
+        "10 x 20": 6944,
+        "10 x 24": 7939,
+        "12 x 16": 7090,
+        "12 x 20": 8084,
+        "12 x 24": 8648,
+        "12 x 26": 9224,
+        "12 x 28": 9438,
+        "12 x 30": 9648,
+        "12 x 32": 10212,
+        "12 x 34": 10777,
+        "12 x 36": 11347,
+        "12 x 38": 11911,
+        "12 x 40": 12481,
+        "14 x 24": 9632,
+        "14 x 28": 10997,
+        "14 x 32": 12062,
+        "14 x 36": 13126,
+        "14 x 40": 13975,
+        "16 x 24": 10997,
+        "16 x 28": 12556,
+        "16 x 32": 13615,
+        "16 x 36": 14545,
+        "16 x 40": 15539
+    },
+    "Elite Cabin": {
+        "14 x 24": 11798,
+        "14 x 28": 12940,
+        "14 x 32": 14002,
+        "14 x 36": 15063,
+        "14 x 40": 15957,
+        "16 x 24": 13471,
+        "16 x 28": 14990,
+        "16 x 32": 15957,
+        "16 x 36": 16844,
+        "16 x 40": 17731
+    },
+    "Chicken Coop": {
+        "6 x 8": 2849,
+        "8 x 8": 2956,
+        "8 x 10": 3451,
+        "8 x 12": 3972,
+        "8 x 16": 4966,
+        "10 x 12": 4966,
+        "10 x 16": 5692,
+        "10 x 20": 7412
+    },
+    "Mini Barn Chicken Coop": {
+        "6 x 8": 2549,
+        "8 x 8": 2656,
+        "8 x 10": 3151,
+        "8 x 12": 3672,
+        "8 x 16": 4666,
+        "10 x 12": 4666,
+        "10 x 16": 5392,
+        "10 x 20": 7112
+    },
+    "Deluxe Dog Kennel": {
+        "8 x 12": 4510,
+        "10 x 12": 5671,
+        "10 x 16": 6418,
+        "10 x 20": 6875,
+        "12 x 12": 5821,
+        "12 x 16": 6455,
+        "12 x 20": 7090,
+        "12 x 24": 7718,
+        "12 x 28": 8347,
+        "12 x 32": 8987,
+        "12 x 36": 9610,
+        "12 x 40": 10245,
+        "14 x 16": 7530,
+        "14 x 24": 9003,
+        "14 x 28": 9740,
+        "14 x 32": 11030,
+        "14 x 36": 12406,
+        "14 x 40": 13835,
+        "16 x 16": 8487,
+        "16 x 24": 10288,
+        "16 x 28": 11137,
+        "16 x 32": 12610,
+        "16 x 40": 15808
+    },
+    "Standard Dog Kennel": {
+        "8 x 12": 4010,
+        "10 x 12": 5171,
+        "10 x 16": 5918,
+        "10 x 20": 6375,
+        "12 x 12": 5321,
+        "12 x 16": 5955,
+        "12 x 20": 6590,
+        "12 x 24": 7218,
+        "12 x 28": 7847,
+        "12 x 32": 8487,
+        "12 x 36": 9110,
+        "12 x 40": 9745,
+        "14 x 16": 7030,
+        "14 x 24": 8503,
+        "14 x 28": 9240,
+        "14 x 32": 10530,
+        "14 x 36": 11906,
+        "14 x 40": 13335,
+        "16 x 16": 7987,
+        "16 x 24": 9788,
+        "16 x 28": 10637,
+        "16 x 32": 12110,
+        "16 x 40": 15308
+    },
+    "Garage": {
+        "12 x 12": 5418,
+        "12 x 16": 6235,
+        "12 x 20": 7090,
+        "12 x 24": 7654,
+        "12 x 28": 8224,
+        "12 x 30": 8509,
+        "12 x 32": 8794,
+        "12 x 34": 9412,
+        "12 x 36": 10003,
+        "12 x 40": 10573,
+        "14 x 20": 8595,
+        "14 x 24": 9218,
+        "14 x 28": 9928,
+        "14 x 32": 10637,
+        "14 x 36": 11632,
+        "14 x 40": 12620,
+        "16 x 24": 10212,
+        "16 x 28": 10997,
+        "16 x 32": 11718,
+        "16 x 36": 12986,
+        "16 x 40": 14185
+    },
+    "Lofted Garage": {
+        "12 x 16": 6520,
+        "12 x 20": 7552,
+        "12 x 24": 8584,
+        "12 x 28": 9541,
+        "12 x 32": 9928,
+        "12 x 34": 10352,
+        "12 x 36": 10777,
+        "12 x 40": 11202,
+        "14 x 24": 10003,
+        "14 x 28": 11132,
+        "14 x 32": 12196,
+        "14 x 36": 13050,
+        "14 x 40": 14185,
+        "16 x 24": 11422,
+        "16 x 28": 12701,
+        "16 x 32": 13228,
+        "16 x 36": 14470,
+        "16 x 40": 15609
+    },
+    "Garden Shed": {
+        "6 x 8": 2935,
+        "8 x 8": 2978,
+        "8 x 12": 3214,
+        "8 x 16": 3687,
+        "8 x 20": 4397,
+        "10 x 12": 3542,
+        "10 x 16": 4252,
+        "10 x 20": 5015,
+        "10 x 24": 5784,
+        "12 x 12": 4370,
+        "12 x 16": 5101,
+        "12 x 20": 6031,
+        "12 x 24": 6934,
+        "12 x 28": 7783,
+        "12 x 32": 8154,
+        "12 x 34": 8546,
+        "12 x 36": 9078,
+        "12 x 40": 9933,
+        "14 x 24": 8444,
+        "14 x 28": 9116,
+        "14 x 32": 9928,
+        "14 x 36": 11347,
+        "14 x 40": 12056,
+        "16 x 24": 9826,
+        "16 x 28": 10637,
+        "16 x 32": 11486,
+        "16 x 36": 12341,
+        "16 x 40": 13190
+    },
+    "Lofted Garden Shed": {
+        "8 x 12": 3639,
+        "8 x 16": 3961,
+        "10 x 12": 4284,
+        "10 x 16": 5348,
+        "10 x 20": 6316,
+        "10 x 24": 7283,
+        "12 x 16": 6128,
+        "12 x 20": 6665,
+        "12 x 24": 7514,
+        "12 x 28": 8364,
+        "12 x 32": 9138,
+        "12 x 34": 9664,
+        "12 x 36": 10003,
+        "12 x 40": 10858,
+        "14 x 24": 10148,
+        "14 x 28": 10858,
+        "14 x 32": 11669,
+        "14 x 36": 12276,
+        "14 x 40": 12766,
+        "16 x 24": 10390,
+        "16 x 28": 11142,
+        "16 x 32": 12185,
+        "16 x 36": 13050,
+        "16 x 40": 14470
+    },
+    "Greenhouse": {
+        "8 x 8": 3112,
+        "8 x 10": 3897,
+        "8 x 12": 4252,
+        "8 x 16": 5343,
+        "8 x 20": 6434,
+        "10 x 10": 5079,
+        "10 x 12": 5310,
+        "10 x 16": 7025,
+        "10 x 20": 8423,
+        "10 x 24": 9138,
+        "10 x 32": 10745,
+        "12 x 12": 6386,
+        "12 x 16": 8487,
+        "12 x 20": 8917,
+        "12 x 24": 10051,
+        "12 x 28": 10831,
+        "12 x 32": 11610,
+        "12 x 36": 12389,
+        "12 x 40": 13174,
+        "14 x 24": 11718,
+        "14 x 28": 12513,
+        "14 x 32": 13292,
+        "14 x 40": 14072,
+        "16 x 24": 13400,
+        "16 x 28": 14185,
+        "16 x 32": 14959,
+        "16 x 40": 15743
+    },
+    "Mini Barn": {
+        "8 x 8": 2193,
+        "8 x 10": 2446,
+        "8 x 12": 2623,
+        "8 x 16": 3053,
+        "10 x 12": 3160,
+        "10 x 16": 3676,
+        "10 x 20": 4096,
+        "10 x 24": 4515,
+        "12 x 12": 4106,
+        "12 x 16": 4536,
+        "12 x 20": 5429,
+        "12 x 24": 6170,
+        "12 x 32": 7735
+    },
+    "Utility Shed": {
+        "6 x 8": 2827,
+        "8 x 8": 2881,
+        "8 x 10": 2999,
+        "8 x 12": 3118,
+        "8 x 16": 3607,
+        "10 x 10": 3187,
+        "10 x 12": 3397,
+        "10 x 16": 4106,
+        "10 x 20": 4816,
+        "10 x 24": 5590,
+        "12 x 12": 4252,
+        "12 x 16": 4961,
+        "12 x 20": 5950,
+        "12 x 24": 6810,
+        "12 x 32": 8224,
+        "12 x 34": 8428,
+        "12 x 36": 8729,
+        "12 x 40": 9008,
+        "14 x 24": 7944,
+        "14 x 28": 8799,
+        "14 x 32": 9648,
+        "14 x 36": 10497,
+        "14 x 40": 11492,
+        "16 x 20": 8509,
+        "16 x 24": 9084,
+        "16 x 28": 10003,
+        "16 x 32": 10997,
+        "16 x 36": 11846,
+        "16 x 40": 12841
+    },
+    "Lofted Barn": {
+        "8 x 10": 3435,
+        "8 x 12": 3542,
+        "8 x 16": 3865,
+        "8 x 20": 4257,
+        "10 x 12": 4187,
+        "10 x 16": 5155,
+        "10 x 20": 6122,
+        "10 x 24": 7090,
+        "12 x 12": 4832,
+        "12 x 16": 5934,
+        "12 x 20": 6461,
+        "12 x 24": 7310,
+        "12 x 28": 8159,
+        "12 x 32": 8880,
+        "12 x 36": 9718,
+        "12 x 40": 10573,
+        "14 x 20": 9293,
+        "14 x 24": 9863,
+        "14 x 28": 10573,
+        "14 x 32": 11384,
+        "14 x 36": 11992,
+        "14 x 40": 12481,
+        "16 x 24": 10105,
+        "16 x 28": 10858,
+        "16 x 32": 11782,
+        "16 x 36": 12766,
+        "16 x 40": 14185
+    },
+    "Barn": {
+        "8 x 10": 3035,
+        "8 x 12": 3142,
+        "8 x 16": 3465,
+        "8 x 20": 3857,
+        "10 x 12": 3787,
+        "10 x 16": 4755,
+        "10 x 20": 5722,
+        "10 x 24": 6690,
+        "12 x 12": 4432,
+        "12 x 16": 5534,
+        "12 x 20": 6061,
+        "12 x 24": 6910,
+        "12 x 28": 7759,
+        "12 x 32": 8480,
+        "12 x 36": 9318,
+        "12 x 40": 10173,
+        "14 x 20": 8893,
+        "14 x 24": 9463,
+        "14 x 28": 10173,
+        "14 x 32": 10984,
+        "14 x 36": 11592,
+        "14 x 40": 12081,
+        "16 x 24": 9705,
+        "16 x 28": 10458,
+        "16 x 32": 11382,
+        "16 x 36": 12366,
+        "16 x 40": 13785
+    },
+    "Playhouse": {
+        "8 x 12": 3094,
+        "8 x 16": 4002,
+        "8 x 20": 5104,
+        "8 x 24": 6319,
+        "10 x 16": 4986,
+        "10 x 20": 5410,
+        "10 x 24": 6405,
+        "10 x 26": 6969,
+        "12 x 16": 6265,
+        "12 x 20": 6695,
+        "12 x 24": 7684,
+        "12 x 26": 8109,
+        "12 x 28": 8469,
+        "12 x 30": 8818,
+        "12 x 32": 9243,
+        "12 x 34": 9667,
+        "12 x 36": 10092,
+        "12 x 38": 10522,
+        "12 x 40": 10947,
+        "14 x 24": 9038,
+        "14 x 28": 9952,
+        "14 x 32": 10802,
+        "14 x 36": 11651,
+        "14 x 40": 12366,
+        "16 x 24": 10377,
+        "16 x 28": 11592,
+        "16 x 32": 12366,
+        "16 x 36": 13075,
+        "16 x 40": 13785
+    },
+    "Lofted Playhouse": {
+        "8 x 12": 3443,
+        "8 x 16": 4438,
+        "8 x 20": 5652,
+        "8 x 24": 6991,
+        "10 x 16": 5556,
+        "10 x 20": 6544,
+        "10 x 24": 7539,
+        "12 x 16": 6690,
+        "12 x 20": 7684,
+        "12 x 24": 8248,
+        "12 x 26": 8824,
+        "12 x 28": 9038,
+        "12 x 30": 9248,
+        "12 x 32": 9812,
+        "12 x 34": 10377,
+        "12 x 36": 10947,
+        "12 x 38": 11511,
+        "12 x 40": 12081,
+        "14 x 24": 9232,
+        "14 x 28": 10597,
+        "14 x 32": 11662,
+        "14 x 36": 12726,
+        "14 x 40": 13575,
+        "16 x 24": 10597,
+        "16 x 28": 12156,
+        "16 x 32": 13215,
+        "16 x 36": 14145,
+        "16 x 40": 15139
+    },
+    "Run-in Shelter": {
+        "6 x 8": 2627,
+        "8 x 8": 2681,
+        "8 x 10": 2799,
+        "8 x 12": 2918,
+        "8 x 16": 3407,
+        "10 x 10": 2987,
+        "10 x 12": 3197,
+        "10 x 16": 3906,
+        "10 x 20": 4616,
+        "10 x 24": 5390,
+        "12 x 12": 4052,
+        "12 x 16": 4761,
+        "12 x 20": 5750,
+        "12 x 24": 6610,
+        "12 x 32": 8024,
+        "12 x 34": 8228,
+        "12 x 36": 8529,
+        "12 x 40": 8808,
+        "14 x 24": 7744,
+        "14 x 28": 8599,
+        "14 x 32": 9448,
+        "14 x 36": 10297,
+        "14 x 40": 11292,
+        "16 x 20": 8309,
+        "16 x 24": 8884,
+        "16 x 28": 9803,
+        "16 x 32": 10797,
+        "16 x 36": 11646,
+        "16 x 40": 12641
+    },
+    "Door": {
+        "36\" Barn Door": 150,
+        "36\" Entry Door": 530,
+        "36\" Entry Door w/ Window": 625,
+        "6' x 6' Rollup Garage Door": 750,
+        "72\" x 72\" Double Door (Std)": 250,
+        "72\" x 84\" Door": 290,
+        "9' x 7' Black Garage Track Door": 1500,
+        "9' x 7' Black Rollup Garage Door": 1250,
+        "9' x 7' Garage Track Door": 1500,
+        "9' x 7' Rollup Garage Door": 850,
+        "Dutch Door": 300,
+        "Playhouse Door": 150
+    },
+    "Window": {
+        "10\u201dx29\u201d Black Transom Window": 120,
+        "10\u201dx29\u201d White Transom Window": 90,
+        "10\u201dx60\u201d Black Transom Window": 145,
+        "10\u201dx60\u201d White Transom Window": 115,
+        "18\" x 27\" Window": 85,
+        "2' x 3' Black Insulated Window": 655,
+        "2' x 3' White Insulated Window": 180,
+        "2' x 3' White Window": 90,
+        "2\u2019x3\u2019 Black Window": 120,
+        "3' x 3' Black Window": 150,
+        "3' x 3' White Insulated Window": 220,
+        "3' x 3' White Window": 110,
+        "3\u2019x3\u2019 Black Insulated Window": 690,
+        "Octagon Window": 90,
+        "Window Shutters": 40
+    },
+    "Accessory": {
+        "100 Amp Breaker Panel": 325,
+        "15\" x 21\u201d Dog Door": 115,
+        "18\u201d x 28\u201d dog door": 175,
+        "200 Amp Breaker Panel": 600,
+        "3' x 5' Ramp": 175,
+        "4\" x 16\" Air Vent (2)": 20,
+        "5' Dog Run": 550,
+        "6' x 5' Ramp": 225,
+        "6\" Overhang for Lofted Gable": 350,
+        "8' Dog Run": 625,
+        "8\" x 8\" Air Vent (metal/GH)": 20,
+        "9' x 5' Ramp": 275,
+        "Chicken Box": 50,
+        "Chicken Door": 75,
+        "Electrical Outlet": 115,
+        "Flower Box": 50,
+        "Ladder": 50,
+        "Roost Rail": 75,
+        "Shelf (12\")": 6,
+        "STK Dog Run": 325,
+        "Tack Room": 600,
+        "Whelping Box": 275,
+        "Workbench (24\")": 9
+    }
+};
+
+        // --- Virtual Tour Mapping (Matterport Links) ---
+    const tourLinks = {
+        "Barn": "https://my.matterport.com/show/?m=FmjgYedJ4v4&play=1",
+        "Lofted Barn": "https://my.matterport.com/show/?m=ETD4V8645yq&play=1",
+        "Cabin": "https://my.matterport.com/show/?m=ZqTMicxSa9G&play=1",
+        "Lofted Cabin": "https://my.matterport.com/show/?m=Fku6ewd45BT&play=1",
+        "Garden Shed": "https://my.matterport.com/show/?m=jmVasKXhGjd&play=1",
+        "Lofted Garden Shed": "https://my.matterport.com/show/?m=PMhDDQX8VPu&play=1",
+        "Garage": "https://my.matterport.com/show/?m=uubDBtaiDTv&play=1",
+        "Lofted Garage": "https://my.matterport.com/show/?m=5EH9HtLBbDG&play=1",
+        "Utility Shed": "https://my.matterport.com/show/?m=6YiH4iV8rPK&play=1",
+        "Greenhouse": "https://my.matterport.com/show/?m=szVdpri2U6S&play=1",
+        "Standard Dog Kennel": "https://my.matterport.com/show/?m=zVTHMYk1LQS&play=1",
+        "Deluxe Dog Kennel": "https://my.matterport.com/show/?m=G3THfYMZMK3&play=1",
+        "Chicken Coop": "https://my.matterport.com/show/?m=2YcgR97Pz8x&play=1",
+        "Mini Barn Chicken Coop": "https://my.matterport.com/show/?m=pBEnaNykWdN&play=1",
+        "Playhouse": "https://my.matterport.com/show/?m=UnfuR3HLpes&play=1",
+        "Lofted Playhouse": "https://my.matterport.com/show/?m=8cQVPne4nxs&play=1",
+        "Run-in Shelter": "https://my.matterport.com/show/?m=F1UjEZn77dG&play=1"
     };
 
     const sidingColors = [
@@ -345,26 +909,49 @@
         const savedSidingColor = components.walls ? components.walls.material.color.getHexString() : 'A8ADAD';
         const savedRoofColor = components.roof ? components.roof.material.color.getHexString() : '5F615D';
 
-        // Load textures and set wrapping for LP SmartSide Siding
-        const wallNormalTex = textureLoader.load('lp_smartside_normal.png');
-        wallNormalTex.wrapS = THREE.RepeatWrapping;
-        wallNormalTex.wrapT = THREE.RepeatWrapping;
-        wallNormalTex.repeat.set(w / 1.5, h / 2);
+        // Load Siding textures dynamically based on user Siding Material selection
+        let wallNormalTex, wallRoughTex, wallMat;
+        
+        if (currentSidingMaterial === 'wood') {
+            wallNormalTex = textureLoader.load('lp_smartside_normal.png');
+            wallNormalTex.wrapS = THREE.RepeatWrapping;
+            wallNormalTex.wrapT = THREE.RepeatWrapping;
+            wallNormalTex.repeat.set(w / 1.5, h / 2);
 
-        const wallRoughTex = textureLoader.load('lp_smartside_roughness.png');
-        wallRoughTex.wrapS = THREE.RepeatWrapping;
-        wallRoughTex.wrapT = THREE.RepeatWrapping;
-        wallRoughTex.repeat.set(w / 1.5, h / 2);
+            wallRoughTex = textureLoader.load('lp_smartside_roughness.png');
+            wallRoughTex.wrapS = THREE.RepeatWrapping;
+            wallRoughTex.wrapT = THREE.RepeatWrapping;
+            wallRoughTex.repeat.set(w / 1.5, h / 2);
 
-        // Wall Material (LP SmartSide Style)
-        const wallMat = new THREE.MeshStandardMaterial({ 
-            color: new THREE.Color('#' + savedSidingColor),
-            roughness: 0.8,
-            metalness: 0.1,
-            normalMap: wallNormalTex,
-            normalScale: new THREE.Vector2(3.0, 3.0), // Deep groove shadow depth!
-            roughnessMap: wallRoughTex
-        });
+            wallMat = new THREE.MeshStandardMaterial({ 
+                color: new THREE.Color('#' + savedSidingColor),
+                roughness: 0.8,
+                metalness: 0.1,
+                normalMap: wallNormalTex,
+                normalScale: new THREE.Vector2(3.0, 3.0), // Deep LP groove shadow depth
+                roughnessMap: wallRoughTex
+            });
+        } else {
+            // Ribbed Metal Siding Material
+            wallNormalTex = textureLoader.load('ribbed_metal_normal.png');
+            wallNormalTex.wrapS = THREE.RepeatWrapping;
+            wallNormalTex.wrapT = THREE.RepeatWrapping;
+            wallNormalTex.repeat.set(w * 2, h);
+
+            wallRoughTex = textureLoader.load('ribbed_metal_roughness.png');
+            wallRoughTex.wrapS = THREE.RepeatWrapping;
+            wallRoughTex.wrapT = THREE.RepeatWrapping;
+            wallRoughTex.repeat.set(w * 2, h);
+
+            wallMat = new THREE.MeshStandardMaterial({ 
+                color: new THREE.Color('#' + savedSidingColor),
+                roughness: 0.35,
+                metalness: 0.65,
+                normalMap: wallNormalTex,
+                normalScale: new THREE.Vector2(2.5, 2.5), // Deep rib profile depth
+                roughnessMap: wallRoughTex
+            });
+        }
 
         // Load textures and set wrapping for standing-seam Metal Roof
         const roofNormalTex = textureLoader.load('metal_roof_normal.png');
@@ -448,6 +1035,31 @@
             shed.add(trim);
         });
 
+        // --- Dynamic Windows Rendering ---
+        const glassMat = new THREE.MeshStandardMaterial({ color: 0x88ccff, transparent: true, opacity: 0.6 });
+        const winW = 2.0, winH = 3.0;
+        
+        for (let i = 0; i < extraWindowsCount; i++) {
+            const winGroup = new THREE.Group();
+            // Stagger multiple windows or slide them
+            const currentWinX = (i === 0) ? windowPositionX : -windowPositionX;
+            const winZ = hasPorch ? (d/2 - porchDepth + 0.05) : (d/2 + 0.05);
+            winGroup.position.set(currentWinX, winH/2 + 1.5 + 0.6, winZ);
+
+            // Window Glass Mesh
+            const glassGeo = new THREE.PlaneGeometry(winW, winH);
+            const glass = new THREE.Mesh(glassGeo, glassMat);
+            glass.position.z = 0.05;
+            winGroup.add(glass);
+
+            // Window Frame (Trim)
+            const winFrameGeo = new THREE.BoxGeometry(winW + 0.2, winH + 0.2, 0.1);
+            const winFrame = new THREE.Mesh(winFrameGeo, trimMat);
+            winGroup.add(winFrame);
+
+            shed.add(winGroup);
+        }
+
         // --- Cabin Porch Columns and Railings ---
         if (hasPorch) {
             const postGeo = new THREE.BoxGeometry(0.35, h, 0.35);
@@ -481,9 +1093,9 @@
         // --- 4. Double Doors (Front Wall) ---
         const doorW = 5.5, doorH = 6.2;
         const doorGroup = new THREE.Group();
-        // Position doors on front of main wall body
+        // Position doors on front of main wall body dynamically
         const doorZ = hasPorch ? (d/2 - porchDepth + 0.05) : (d/2 + 0.05);
-        doorGroup.position.set(0, doorH/2 + 0.6, doorZ);
+        doorGroup.position.set(doorPositionX, doorH/2 + 0.6, doorZ);
 
         // Door Frame / Trim Outline
         const frameGeom = new THREE.BoxGeometry(doorW + 0.4, doorH + 0.2, 0.1);
@@ -575,9 +1187,89 @@
     }
 
     // --- UI LOGIC ---
+    // Interactive positioning and component states
+    let currentSidingMaterial = 'wood';
+    let doorPositionX = 0;
+    let extraWindowsCount = 0;
+    let windowPositionX = 2;
+
     function setupUI() {
         const styleSelect = document.getElementById('style-select');
         const sizeSelect = document.getElementById('size-select');
+        const sidingMaterialSelect = document.getElementById('siding-material');
+
+        // Handle Siding Material Swapping
+        sidingMaterialSelect.addEventListener('change', (e) => {
+            currentSidingMaterial = e.target.value;
+            
+            // Swap swatches visible to the user
+            const sidingGrid = document.getElementById('siding-colors');
+            sidingGrid.innerHTML = '';
+            
+            if (currentSidingMaterial === 'wood') {
+                sidingColors.forEach(c => {
+                    const sBox = document.createElement('div');
+                    sBox.className = 'color-box';
+                    sBox.style.backgroundColor = c.hex;
+                    sBox.title = c.name;
+                    if (c.name === 'Light Gray') sBox.classList.add('active');
+                    sBox.onclick = () => {
+                        components.walls.material.color.set(c.hex);
+                        document.querySelectorAll('#siding-colors .color-box').forEach(el => el.classList.remove('active'));
+                        sBox.classList.add('active');
+                    };
+                    sidingGrid.appendChild(sBox);
+                });
+                
+                // Toggle default color
+                components.walls.material.color.set('#A8ADAD');
+            } else {
+                // Metal colors only
+                roofColors.forEach(c => {
+                    const sBox = document.createElement('div');
+                    sBox.className = 'color-box';
+                    sBox.style.backgroundColor = c.hex;
+                    sBox.title = c.name;
+                    if (c.name === 'Charcoal Gray') sBox.classList.add('active');
+                    sBox.onclick = () => {
+                        components.walls.material.color.set(c.hex);
+                        document.querySelectorAll('#siding-colors .color-box').forEach(el => el.classList.remove('active'));
+                        sBox.classList.add('active');
+                    };
+                    sidingGrid.appendChild(sBox);
+                });
+                
+                // Toggle default color
+                components.walls.material.color.set('#5F615D');
+            }
+
+            createShed();
+            updatePrice();
+        });
+
+        // Handle Virtual Tour Modal
+        const viewTourBtn = document.getElementById('view-tour-btn');
+        const tourModal = document.getElementById('tour-modal');
+        const tourIframe = document.getElementById('tour-iframe');
+        const tourTitle = document.getElementById('tour-title');
+        const closeTourBtn = document.getElementById('close-tour-btn');
+
+        viewTourBtn.addEventListener('click', () => {
+            const style = styleSelect.value;
+            const tourUrl = tourLinks[style];
+            if (tourUrl) {
+                tourTitle.innerText = `${style.toUpperCase()} - VIRTUAL TOUR`;
+                tourIframe.src = tourUrl;
+                tourModal.style.display = 'flex';
+            } else {
+                alert(`Virtual tour not available for style: ${style}`);
+            }
+        });
+
+        closeTourBtn.addEventListener('click', () => {
+            tourModal.style.display = 'none';
+            tourIframe.src = ''; // stop video/iframe resource
+        });
 
         // Styles
         Object.keys(pricingData).forEach(style => {
@@ -628,9 +1320,13 @@
             roofGrid.appendChild(rBox);
         });
 
-        // Options
+        // Populate accessories list dynamically from master pricing JSON
         const optList = document.getElementById('options-list');
-        ['9\' x 7\' Rollup Garage Door', '3\' x 5\' Ramp', '3\' x 3\' White Window'].forEach(optName => {
+        optList.innerHTML = ''; // clear static list
+        const accessoriesToDisplay = [
+            "3' x 5' Ramp", "6' x 5' Ramp", "9' x 5' Ramp", "Flower Box", "Workbench (24\")", "Electrical Outlet"
+        ];
+        accessoriesToDisplay.forEach(optName => {
             const row = document.createElement('div');
             row.className = 'option-row';
             
@@ -638,15 +1334,50 @@
             chk.type = 'checkbox'; chk.id = 'opt-' + optName;
             chk.onchange = (e) => {
                 updatePrice();
-                // Visual feedback in 3D for door
-                if (optName.includes('Garage')) components.door.visible = !e.target.checked;
             };
             
             const lbl = document.createElement('label');
-            lbl.htmlFor = 'opt-' + optName; lbl.innerText = optName;
+            lbl.htmlFor = 'opt-' + optName; 
+            const optPrice = pricingData.Accessory[optName] || 0;
+            lbl.innerText = `${optName} (+$${optPrice})`;
             
             row.appendChild(chk); row.appendChild(lbl);
             optList.appendChild(row);
+        });
+
+        // Slider position listeners
+        const doorPosSlider = document.getElementById('door-position');
+        const doorPosVal = document.getElementById('door-pos-val');
+        doorPosSlider.addEventListener('input', (e) => {
+            doorPositionX = parseFloat(e.target.value);
+            doorPosVal.innerText = doorPositionX.toFixed(1);
+            
+            // Surgically shift door mesh in real-time
+            if (components.door) {
+                components.door.position.x = doorPositionX;
+            }
+        });
+
+        const winSelect = document.getElementById('win-select');
+        const winPosSlider = document.getElementById('win-position');
+        const winPosVal = document.getElementById('win-pos-val');
+        const winPosGroup = document.getElementById('window-position-group');
+
+        winSelect.addEventListener('change', (e) => {
+            extraWindowsCount = parseInt(e.target.value);
+            if (extraWindowsCount > 0) {
+                winPosGroup.style.display = 'block';
+            } else {
+                winPosGroup.style.display = 'none';
+            }
+            createShed();
+            updatePrice();
+        });
+
+        winPosSlider.addEventListener('input', (e) => {
+            windowPositionX = parseFloat(e.target.value);
+            winPosVal.innerText = windowPositionX.toFixed(1);
+            createShed();
         });
 
         sizeSelect.addEventListener('change', updatePrice);
@@ -669,9 +1400,13 @@
         const size = document.getElementById('size-select').value;
         let total = pricingData[style][size] || 0;
 
+        // Add extra windows price
+        total += extraWindowsCount * 90;
+
         document.querySelectorAll('#options-list input:checked').forEach(cb => {
             const name = cb.id.replace('opt-', '');
-            total += (pricingData.Door[name] || pricingData.Window[name] || pricingData.Accessory[name] || 0);
+            // Locate price dynamically from master lists
+            total += (pricingData.Accessory[name] || pricingData.Door[name] || pricingData.Window[name] || 0);
         });
 
         document.getElementById('price-display').innerText = '$' + total.toLocaleString(undefined, {minimumFractionDigits: 2});
@@ -752,5 +1487,17 @@
     };
 </script>
 
+
+    <!-- Virtual Tour Iframe Modal -->
+    <div id="tour-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 10000; align-items: center; justify-content: center; flex-direction: column; padding: 2rem;">
+        <div style="background: white; border-radius: 16px; width: 100%; max-width: 900px; height: 80vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);">
+            <div style="background: var(--primary); color: white; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <h3 id="tour-title" style="margin: 0; font-weight: 800; font-size: 1.15rem; letter-spacing: 0.5px;">VIRTUAL TOUR</h3>
+                <button id="close-tour-btn" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; font-weight: 800; line-height: 1;">&times;</button>
+            </div>
+            <iframe id="tour-iframe" src="" style="flex-grow: 1; border: none;" allowfullscreen allow="xr-spatial-tracking"></iframe>
+        </div>
+    </div>
+    
 </body>
 </html>
